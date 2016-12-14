@@ -189,7 +189,7 @@ int main(int argc, char **argv)
 	glutInitWindowSize(500, 500);
 	glutInitContextVersion(3, 2);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
-	glutCreateWindow("robot");
+	glutCreateWindow("2014150266_张航_期末大作业");
 
 	glewExperimental = GL_TRUE;
 	glewInit();
