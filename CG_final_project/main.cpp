@@ -12,15 +12,25 @@ typedef Angel::vec4 color4;
 
 // 边长为1的正方形
 point4 vertices[8] = {
+	point4(-0.5, -0.5,-0.5, 1.0),
 	point4(-0.5, -0.5, 0.5, 1.0),
-	point4(-0.5, 0.5, 0.5, 1.0),
-	point4(0.5, 0.5, 0.5, 1.0),
+	point4(0.5, -0.5, -0.5, 1.0),
 	point4(0.5, -0.5, 0.5, 1.0),
-	point4(-0.5, -0.5, -0.5, 1.0),
 	point4(-0.5, 0.5, -0.5, 1.0),
+	point4(-0.5, 0.5, 0.5, 1.0),
 	point4(0.5, 0.5, -0.5, 1.0),
-	point4(0.5, -0.5, -0.5, 1.0)
+	point4(0.5, 0.5, 0.5, 1.0)
 };
+
+// 常用颜色
+color4 black(0.0, 0.0, 0.0, 1.0);
+color4 red(1.0, 0.0, 0.0, 1.0);
+color4 yellow(1.0, 1.0, 0.0, 1.0);
+color4 green(0.0, 1.0, 0.0, 1.0);
+color4 blue(0.0, 0.0, 1.0, 1.0);
+color4 magenta(1.0, 0.0, 1.0, 1.0);
+color4 cyan(0.0, 1.0, 1.0, 1.0);
+color4 white(1.0, 1.0, 1.0, 1.0);
 
 // RGBA olors
 // 一些常见的颜色
@@ -32,7 +42,7 @@ color4 vertex_colors[8] = {
 	color4(0.0, 0.0, 1.0, 1.0),  // blue
 	color4(1.0, 0.0, 1.0, 1.0),  // magenta
 	color4(0.0, 1.0, 1.0, 1.0),   // cyan
-	color4(1.0, 1.0, 1.0, 1.0)  // white
+	color4(1.0, 1.0, 1.0, 1.0)    // white
 };
 
 GLuint ModelView;
@@ -40,6 +50,19 @@ GLuint Projection;
 
 vector<point4> points;
 vector<color4> colors;
+
+mat4 modelViewMat(1.0);
+mat4 projectionMat(1.0);
+
+// 旋转角度大小
+const float THETA = 2.0;
+float rotationAngle[3] = { 0.0,0.0,0.0 };
+// 坐标轴常量
+enum {
+	X_axis = 0,
+	Y_axis = 1,
+	Z_axis = 2
+};
 
 // 矩阵栈
 class MatrixStack {
@@ -121,13 +144,56 @@ namespace Camera
 	}
 }
 
+// 正方体的一个面
+void quad(int a, int b, int c, int d, color4 color)
+{
+	points.push_back(vertices[a]);
+	points.push_back(vertices[b]);
+	points.push_back(vertices[c]);
+	points.push_back(vertices[b]);
+	points.push_back(vertices[c]);
+	points.push_back(vertices[d]);
+	for (int i = 0;i < 6;i++)
+		colors.push_back(color);
+}
+
+// 绘制边长为1的正方体
+void draw_cube(color4 color)
+{
+	quad(0, 1, 2, 3, color);
+	quad(4, 5, 6, 7, color);
+	quad(0, 1, 4, 5, color);
+	quad(2, 3, 6, 7, color);
+	quad(0, 2, 4, 6, color);
+	quad(1, 3, 5, 7, color);
+}
+
+// 绘制地板
+void draw_floor()
+{
+	point4 p1(-3, 0, -3, 1.0);
+	point4 p2(-3, 0, 3, 1.0);
+	point4 p3(3, 0, -3, 1.0);
+	point4 p4(3, 0, 3, 1.0);
+
+	points.push_back(p1);
+	points.push_back(p2);
+	points.push_back(p3);
+	points.push_back(p2);
+	points.push_back(p3);
+	points.push_back(p4);
+	for (int i = 0;i < 6;i++)
+		colors.push_back(green);
+}
+
 
 // 初始化函数，初始化一些参数信息
 void init()
 {
 	// 顶点生成
 	// todo here
-	
+	draw_floor();
+	draw_cube(red);
 
 
 
@@ -167,23 +233,27 @@ void init()
 	// 开启深度测试
 	glEnable(GL_DEPTH_TEST);
 	// 这些作用未知 ？？
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable(GL_LIGHTING);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_CULL_FACE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glEnable(GL_LIGHTING);
+	//glDepthFunc(GL_LESS);
+	//glEnable(GL_CULL_FACE);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 }
+
 
 // 渲染函数，负责更新图形界面
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	modelViewMat = RotateX(rotationAngle[X_axis]);
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelViewMat);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
+	modelViewMat = RotateX(rotationAngle[X_axis]) * Translate(0, 0.5, -1.5);
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelViewMat);
+	glDrawArrays(GL_TRIANGLES, 6, points.size()); 
 
-//	glUniformMatrix4fv(ModelView, 1, GL_TRUE, instance);//父节点矩阵*本节点局部变换矩阵
-//	glDrawArrays(GL_TRIANGLES, 0, points.size()); 
-
-//	glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
+	//glUniformMatrix4fv(Projection, 1, GL_TRUE, projectionMat);
 
 	glutSwapBuffers();
 }
@@ -209,8 +279,20 @@ void reshape(int width, int height)
 	//	top /= aspect;
 	//}
 
-	// mat4 projection = Ortho(left, right, bottom, top, zNear, zFar);
-	//glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
+	GLfloat radius = 1.0;
+	GLfloat theta = 3.1415 / 4;
+	GLfloat phi = 3.1415 / 2;
+	/*point4  eye(radius*sin(theta)*cos(phi),
+		radius*sin(theta)*sin(phi),
+		radius*cos(theta),
+		1.0);*/
+	point4 eye(0, 1, 1, 1.0);
+	point4  at(0.0, 0.0, 0.50, 1.0);
+	vec4    up(0.0, 1.0, 0.0, 0.0);
+
+
+	mat4 projection = Ortho(-3, 3, 0, 6, -3, 3) * Camera::lookAt(eye, at, up);
+	glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
 
 	//model_view = mat4(1.0);   // An Identity matrix
 }
@@ -248,6 +330,23 @@ void mouse(int button, int state, int x, int y)
 	glutPostRedisplay();
 }
 
+
+// 键盘上下左右键响应函数
+void specialKeyboard(int key, int x, int y)
+{
+
+	switch (key)
+	{
+	case GLUT_KEY_DOWN:
+		rotationAngle[X_axis] += THETA;
+		break;
+	case GLUT_KEY_UP:
+		rotationAngle[X_axis] -= THETA;
+		break;
+	}
+	glutPostRedisplay();
+}
+
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
@@ -266,6 +365,7 @@ int main(int argc, char **argv)
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
+	glutSpecialFunc(specialKeyboard);
 
 
 
