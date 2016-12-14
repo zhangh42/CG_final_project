@@ -1,10 +1,26 @@
 #include "Angel.h"
 #include <cassert>
+#include <vector>
+using std::vector;
+using std::cout;
+using std::endl;
 
 #pragma comment(lib, "glew32.lib")
 
 typedef Angel::vec4 point4;
 typedef Angel::vec4 color4;
+
+// 边长为1的正方形
+point4 vertices[8] = {
+	point4(-0.5, -0.5, 0.5, 1.0),
+	point4(-0.5, 0.5, 0.5, 1.0),
+	point4(0.5, 0.5, 0.5, 1.0),
+	point4(0.5, -0.5, 0.5, 1.0),
+	point4(-0.5, -0.5, -0.5, 1.0),
+	point4(-0.5, 0.5, -0.5, 1.0),
+	point4(0.5, 0.5, -0.5, 1.0),
+	point4(0.5, -0.5, -0.5, 1.0)
+};
 
 // RGBA olors
 // 一些常见的颜色
@@ -15,9 +31,15 @@ color4 vertex_colors[8] = {
 	color4(0.0, 1.0, 0.0, 1.0),  // green
 	color4(0.0, 0.0, 1.0, 1.0),  // blue
 	color4(1.0, 0.0, 1.0, 1.0),  // magenta
-	color4(1.0, 1.0, 1.0, 1.0),  // white
-	color4(0.0, 1.0, 1.0, 1.0)   // cyan
+	color4(0.0, 1.0, 1.0, 1.0),   // cyan
+	color4(1.0, 1.0, 1.0, 1.0)  // white
 };
+
+GLuint ModelView;
+GLuint Projection;
+
+vector<point4> points;
+vector<color4> colors;
 
 // 矩阵栈
 class MatrixStack {
@@ -99,27 +121,71 @@ namespace Camera
 	}
 }
 
+
 // 初始化函数，初始化一些参数信息
 void init()
 {
 	// 顶点生成
 	// todo here
+	
+
+
+
+	// Create a vertex array object
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	// Create and initialize a buffer object
+	GLuint buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(point4) * points.size() + sizeof(color4) * colors.size(),
+		NULL, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(point4) * points.size(), &points[0]);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(point4) * points.size(), sizeof(color4) * colors.size(),
+		&colors[0]);
+
+	// Load shaders and use the resulting shader program
+	GLuint program = InitShader("vshader82.glsl", "fshader82.glsl");
+	glUseProgram(program);
+
+	GLuint vPosition = glGetAttribLocation(program, "vPosition");
+	glEnableVertexAttribArray(vPosition);
+	glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0,
+		BUFFER_OFFSET(0));
+
+	GLuint vColor = glGetAttribLocation(program, "vColor");
+	glEnableVertexAttribArray(vColor);
+	glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0,
+		BUFFER_OFFSET(sizeof(point4) * points.size()));
+
+	ModelView = glGetUniformLocation(program, "ModelView");
+	Projection = glGetUniformLocation(program, "Projection");
 
 
 	// 开启深度测试
 	glEnable(GL_DEPTH_TEST);
 	// 这些作用未知 ？？
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//glEnable(GL_LIGHTING);
-	//glDepthFunc(GL_LESS);
-	//glEnable(GL_CULL_FACE);
-	//glClearColor(1.0, 1.0, 1.0, 1.0);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_LIGHTING);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_CULL_FACE);
+	glClearColor(1.0, 1.0, 1.0, 1.0);
 }
 
 // 渲染函数，负责更新图形界面
 void display()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+//	glUniformMatrix4fv(ModelView, 1, GL_TRUE, instance);//父节点矩阵*本节点局部变换矩阵
+//	glDrawArrays(GL_TRIANGLES, 0, points.size()); 
+
+//	glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
+
+	glutSwapBuffers();
 }
 
 // 当窗口大小改变时调用此函数，根据长宽变化调整一些参数信息，
@@ -143,7 +209,7 @@ void reshape(int width, int height)
 	//	top /= aspect;
 	//}
 
-	//mat4 projection = Ortho(left, right, bottom, top, zNear, zFar);
+	// mat4 projection = Ortho(left, right, bottom, top, zNear, zFar);
 	//glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
 
 	//model_view = mat4(1.0);   // An Identity matrix
