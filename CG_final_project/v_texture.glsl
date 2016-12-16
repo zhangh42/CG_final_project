@@ -13,6 +13,7 @@ out vec4 normal;
 
 uniform vec3 theta;
 uniform vec3 translation;
+uniform mat4 projection;
 
 void main()
 {
@@ -51,5 +52,5 @@ void main()
     gl_Position = rz * ry * rx * gl_Position;
     vec4 t = rz * ry * rx * vec4(translation, 1.0);
 
-    gl_Position = gl_Position + vec4(translation, 0.0);
+    gl_Position = projection * (gl_Position + vec4(translation, 0.0));
 }

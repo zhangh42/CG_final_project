@@ -70,6 +70,18 @@ void My_Model::draw_human()
 
 void My_Model::draw_grass(string texture_file_name)
 {
+	My_Mesh* my_mesh1 = new My_Mesh;
+	my_mesh1->generate_floor();//生成地板
+	my_mesh1->set_texture_file(texture_file_name);//指定纹理图像文件
+	my_mesh1->set_translate(0, 0, 0);
+//	my_mesh1->set_theta(45, 45, 45.);//旋转轴
+//	my_mesh1->set_theta_step(1, 1, 1);//旋转速度
+	m_mp.add_mesh(my_mesh1);
+
+
+	m_mp.init_shaders("v_texture.glsl", "f_texture.glsl");
+	m_mp.update_vertex_buffer();
+	m_mp.update_texture();
 }
 
 int My_Model::get_points_size()
@@ -80,4 +92,9 @@ int My_Model::get_points_size()
 int My_Model::get_colors_size()
 {
 	return colorSize;
+}
+
+void My_Model::draw_mesh()
+{
+	m_mp.draw_meshes();
 }

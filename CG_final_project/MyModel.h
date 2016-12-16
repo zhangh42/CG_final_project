@@ -3,6 +3,8 @@
 #include "Angel.h"
 #include<vector>
 #include <string>
+#include "mesh.h"
+#include "Mesh_Painter.h"
 using std::vector;
 using std::string;
 
@@ -11,6 +13,8 @@ typedef Angel::vec4 color4;
 typedef vector<point4> pointVec;
 typedef vector<color4> colorVec;
 typedef vector<float> textureVec;
+
+
 
 // 边长为1的正方形
 static point4 vertices[8] = {
@@ -43,6 +47,8 @@ private:
 	int pointSize;
 	int colorSize;
 
+	Mesh_Painter m_mp;
+
 	// 正方体的一个面
 	void quad(int a, int b, int c, int d, color4 color);
 public:
@@ -55,6 +61,7 @@ public:
 	void draw_grass(string texture_file_name);
 	int get_points_size();
 	int get_colors_size();
+	void draw_mesh();
 };
 
 

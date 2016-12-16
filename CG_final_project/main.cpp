@@ -15,8 +15,8 @@ My_Model m_model;
 
 GLuint ModelView;
 GLuint Projection;
-GLuint isTexture;
-GLuint texture;
+GLuint program;
+GLuint vao;
 
 vector<point4> points;
 vector<color4> colors;
@@ -121,7 +121,8 @@ void init()
 {
 	// 顶点生成
 	// todo here
-	m_model.draw_floor();
+	m_model.draw_grass("texture/seamless_grass.jpg");
+	//m_model.draw_floor();
 	m_model.draw_cube(red);
 	points = m_model.get_points();
 	colors = m_model.get_colors();
@@ -129,7 +130,7 @@ void init()
 
 
 	// Create a vertex array object
-	GLuint vao;
+	vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
@@ -144,7 +145,7 @@ void init()
 		&colors[0]);
 
 	// Load shaders and use the resulting shader program
-	GLuint program = InitShader("vshader.glsl", "fshader.glsl");
+	program = InitShader("vshader.glsl", "fshader.glsl");
 	glUseProgram(program);
 
 	GLuint vPosition = glGetAttribLocation(program, "vPosition");
@@ -158,16 +159,14 @@ void init()
 		BUFFER_OFFSET(sizeof(point4) * points.size()));
 
 	ModelView = glGetUniformLocation(program, "ModelView");
-	Projection = glGetUniformLocation(program, "Projection");
-	texture = glGetUniformLocation(program, "texture");
-	isTexture = glGetUniformLocation(program, "isTexture");
-
+	Projection = glGetUniformLocation(program, "Projection");	
+	//glUseProgram(0);
 
 	// 开启深度测试
 	glEnable(GL_DEPTH_TEST);
 	// 这些作用未知 ？？
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
 	//glDepthFunc(GL_LESS);
 	//glEnable(GL_CULL_FACE);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -178,14 +177,17 @@ void init()
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	modelViewMat = RotateX(rotationAngle[X_axis]);
+	/*modelViewMat = RotateX(rotationAngle[X_axis]);
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelViewMat);
-	glUniform1i(isTexture, 0);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLES, 0, 6);*/
+	m_model.draw_mesh();
+
+	glUseProgram(program);
+	glBindVertexArray(vao);
 
 	modelViewMat = RotateX(rotationAngle[X_axis]) * Translate(0, 0.5, -1.5);
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelViewMat);
-	glDrawArrays(GL_TRIANGLES, 6, points.size()); 
+	glDrawArrays(GL_TRIANGLES, 0, points.size()); 
 
 	//glUniformMatrix4fv(Projection, 1, GL_TRUE, projectionMat);
 
@@ -223,7 +225,6 @@ void reshape(int width, int height)
 	point4 eye(0, 1.0, 1, 1.0);
 	point4  at(0.0, 0.0, 0.0, 1.0);
 	vec4    up(0.0, 1.0, -1.0, 0.0);
-
 
 	mat4 projection = Ortho(-3, 3, 0, 6, -3, 6) * Camera::lookAt(eye, at, up);
 	glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
@@ -300,8 +301,6 @@ int main(int argc, char **argv)
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
 	glutSpecialFunc(specialKeyboard);
-
-
 
 	glutMainLoop();
 	return 0;
