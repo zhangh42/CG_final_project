@@ -15,6 +15,10 @@ void My_Model::quad(int a, int b, int c, int d, color4 color)
 		colors.push_back(color);
 }
 
+My_Model::My_Model()
+{
+}
+
 // 绘制边长为1的正方体
 void My_Model::draw_cube(color4 color)
 {
@@ -24,6 +28,9 @@ void My_Model::draw_cube(color4 color)
 	quad(2, 3, 6, 7, color);
 	quad(0, 2, 4, 6, color);
 	quad(1, 3, 5, 7, color);
+
+	pointSize += 36;
+	colorSize += 36;
 }
 
 // 绘制地板
@@ -42,6 +49,9 @@ void My_Model::draw_floor()
 	points.push_back(p4);
 	for (int i = 0;i < 6;i++)
 		colors.push_back(green);
+
+	pointSize += 6;
+	colorSize += 6;
 }
 
 pointVec My_Model::get_points()
@@ -52,4 +62,22 @@ pointVec My_Model::get_points()
 colorVec My_Model::get_colors()
 {
 	return colors;
+}
+
+void My_Model::draw_human()
+{
+}
+
+void My_Model::draw_grass(string texture_file_name)
+{
+}
+
+int My_Model::get_points_size()
+{
+	return pointSize;
+}
+
+int My_Model::get_colors_size()
+{
+	return colorSize;
 }

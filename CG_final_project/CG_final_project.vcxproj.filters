@@ -21,13 +21,21 @@
     <ClCompile Include="InitShader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="MyModel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vshader82.glsl">
+    <None Include="fshader.glsl">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="fshader82.glsl">
+    <None Include="vshader.glsl">
       <Filter>资源文件</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MyModel.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -144,7 +144,7 @@ void init()
 		&colors[0]);
 
 	// Load shaders and use the resulting shader program
-	GLuint program = InitShader("vshader82.glsl", "fshader82.glsl");
+	GLuint program = InitShader("vshader.glsl", "fshader.glsl");
 	glUseProgram(program);
 
 	GLuint vPosition = glGetAttribLocation(program, "vPosition");

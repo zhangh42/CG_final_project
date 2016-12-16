@@ -123,10 +123,14 @@
   <ItemGroup>
     <ClCompile Include="InitShader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyModel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fshader82.glsl" />
-    <None Include="vshader82.glsl" />
+    <None Include="fshader.glsl" />
+    <None Include="vshader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MyModel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
