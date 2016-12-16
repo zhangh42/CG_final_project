@@ -32,6 +32,12 @@
     <None Include="vshader.glsl">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="v_texture.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="f_texture.glsl">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyModel.h">

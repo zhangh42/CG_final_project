@@ -127,7 +127,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="fshader.glsl" />
+    <None Include="f_texture.glsl" />
     <None Include="vshader.glsl" />
+    <None Include="v_texture.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyModel.h" />
