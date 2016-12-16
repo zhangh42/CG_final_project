@@ -1,52 +1,22 @@
-#include "Angel.h"
 #include <cassert>
 #include <vector>
+#include "Angel.h"
+#include "MyModel.h"
 using std::vector;
 using std::cout;
 using std::endl;
 
 #pragma comment(lib, "glew32.lib")
+#pragma comment(lib, "FreeImage.lib")
 
-typedef Angel::vec4 point4;
-typedef Angel::vec4 color4;
+// 建模类
+My_Model m_model;
 
-// 边长为1的正方形
-point4 vertices[8] = {
-	point4(-0.5, -0.5,-0.5, 1.0),
-	point4(-0.5, -0.5, 0.5, 1.0),
-	point4(0.5, -0.5, -0.5, 1.0),
-	point4(0.5, -0.5, 0.5, 1.0),
-	point4(-0.5, 0.5, -0.5, 1.0),
-	point4(-0.5, 0.5, 0.5, 1.0),
-	point4(0.5, 0.5, -0.5, 1.0),
-	point4(0.5, 0.5, 0.5, 1.0)
-};
-
-// 常用颜色
-color4 black(0.0, 0.0, 0.0, 1.0);
-color4 red(1.0, 0.0, 0.0, 1.0);
-color4 yellow(1.0, 1.0, 0.0, 1.0);
-color4 green(0.0, 1.0, 0.0, 1.0);
-color4 blue(0.0, 0.0, 1.0, 1.0);
-color4 magenta(1.0, 0.0, 1.0, 1.0);
-color4 cyan(0.0, 1.0, 1.0, 1.0);
-color4 white(1.0, 1.0, 1.0, 1.0);
-
-// RGBA olors
-// 一些常见的颜色
-color4 vertex_colors[8] = {
-	color4(0.0, 0.0, 0.0, 1.0),  // black
-	color4(1.0, 0.0, 0.0, 1.0),  // red
-	color4(1.0, 1.0, 0.0, 1.0),  // yellow
-	color4(0.0, 1.0, 0.0, 1.0),  // green
-	color4(0.0, 0.0, 1.0, 1.0),  // blue
-	color4(1.0, 0.0, 1.0, 1.0),  // magenta
-	color4(0.0, 1.0, 1.0, 1.0),   // cyan
-	color4(1.0, 1.0, 1.0, 1.0)    // white
-};
 
 GLuint ModelView;
 GLuint Projection;
+GLuint isTexture;
+GLuint texture;
 
 vector<point4> points;
 vector<color4> colors;
@@ -144,47 +114,6 @@ namespace Camera
 	}
 }
 
-// 正方体的一个面
-void quad(int a, int b, int c, int d, color4 color)
-{
-	points.push_back(vertices[a]);
-	points.push_back(vertices[b]);
-	points.push_back(vertices[c]);
-	points.push_back(vertices[b]);
-	points.push_back(vertices[c]);
-	points.push_back(vertices[d]);
-	for (int i = 0;i < 6;i++)
-		colors.push_back(color);
-}
-
-// 绘制边长为1的正方体
-void draw_cube(color4 color)
-{
-	quad(0, 1, 2, 3, color);
-	quad(4, 5, 6, 7, color);
-	quad(0, 1, 4, 5, color);
-	quad(2, 3, 6, 7, color);
-	quad(0, 2, 4, 6, color);
-	quad(1, 3, 5, 7, color);
-}
-
-// 绘制地板
-void draw_floor()
-{
-	point4 p1(-3, 0, -3, 1.0);
-	point4 p2(-3, 0, 3, 1.0);
-	point4 p3(3, 0, -3, 1.0);
-	point4 p4(3, 0, 3, 1.0);
-
-	points.push_back(p1);
-	points.push_back(p2);
-	points.push_back(p3);
-	points.push_back(p2);
-	points.push_back(p3);
-	points.push_back(p4);
-	for (int i = 0;i < 6;i++)
-		colors.push_back(green);
-}
 
 
 // 初始化函数，初始化一些参数信息
@@ -192,8 +121,10 @@ void init()
 {
 	// 顶点生成
 	// todo here
-	draw_floor();
-	draw_cube(red);
+	m_model.draw_floor();
+	m_model.draw_cube(red);
+	points = m_model.get_points();
+	colors = m_model.get_colors();
 
 
 
@@ -228,6 +159,8 @@ void init()
 
 	ModelView = glGetUniformLocation(program, "ModelView");
 	Projection = glGetUniformLocation(program, "Projection");
+	texture = glGetUniformLocation(program, "texture");
+	isTexture = glGetUniformLocation(program, "isTexture");
 
 
 	// 开启深度测试
@@ -247,6 +180,7 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	modelViewMat = RotateX(rotationAngle[X_axis]);
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelViewMat);
+	glUniform1i(isTexture, 0);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	modelViewMat = RotateX(rotationAngle[X_axis]) * Translate(0, 0.5, -1.5);
@@ -262,22 +196,22 @@ void display()
 // 使整个t图形界面保持美观、结构等
 void reshape(int width, int height)
 {
-	//glViewport(0, 0, width, height);
+	glViewport(0, 0, width, height);
 
-	//GLfloat left = -10.0, right = 10.0;
-	//GLfloat bottom = -5.0, top = 15.0;
-	//GLfloat zNear = -10.0, zFar = 10.0;
+	GLfloat left = -10.0, right = 10.0;
+	GLfloat bottom = -5.0, top = 15.0;
+	GLfloat zNear = -10.0, zFar = 10.0;
 
-	//GLfloat aspect = GLfloat(width) / height;
+	GLfloat aspect = GLfloat(width) / height;
 
-	//if (aspect > 1.0) {
-	//	left *= aspect;
-	//	right *= aspect;
-	//}
-	//else {
-	//	bottom /= aspect;
-	//	top /= aspect;
-	//}
+	if (aspect > 1.0) {
+		left *= aspect;
+		right *= aspect;
+	}
+	else {
+		bottom /= aspect;
+		top /= aspect;
+	}
 
 	GLfloat radius = 1.0;
 	GLfloat theta = 3.1415 / 4;
@@ -286,12 +220,12 @@ void reshape(int width, int height)
 		radius*sin(theta)*sin(phi),
 		radius*cos(theta),
 		1.0);*/
-	point4 eye(0, 1, 1, 1.0);
-	point4  at(0.0, 0.0, 0.50, 1.0);
-	vec4    up(0.0, 1.0, 0.0, 0.0);
+	point4 eye(0, 1.0, 1, 1.0);
+	point4  at(0.0, 0.0, 0.0, 1.0);
+	vec4    up(0.0, 1.0, -1.0, 0.0);
 
 
-	mat4 projection = Ortho(-3, 3, 0, 6, -3, 3) * Camera::lookAt(eye, at, up);
+	mat4 projection = Ortho(-3, 3, 0, 6, -3, 6) * Camera::lookAt(eye, at, up);
 	glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
 
 	//model_view = mat4(1.0);   // An Identity matrix
