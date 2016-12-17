@@ -84,26 +84,26 @@ void My_Mesh::generate_floor()
 {
 	this->clear_data();
 	this->m_center_ = point3f(0, 0, 0);
-	this->m_min_box_ = point3f(-3, 0, -3);
-	this->m_max_box_ = point3f(3, 6, 3);
-
-	m_vertices_.push_back(-4.0);
-	m_vertices_.push_back(0.0);
-	m_vertices_.push_back(-5.0);
-
+	//this->m_min_box_ = point3f(-3, 0, -3);
+	//this->m_max_box_ = point3f(3, 6, 3);
 
 	m_vertices_.push_back(-4.0);
 	m_vertices_.push_back(0.0);
 	m_vertices_.push_back(5.0);
 
+	m_vertices_.push_back(4.0);
+	m_vertices_.push_back(0.0);
+	m_vertices_.push_back(5.0);
+
+	m_vertices_.push_back(-4.0);
+	m_vertices_.push_back(0.0);
+	m_vertices_.push_back(-5.0);	
 
 	m_vertices_.push_back(4.0);
 	m_vertices_.push_back(0.0);
 	m_vertices_.push_back(-5.0);
 
-	m_vertices_.push_back(4.0);
-	m_vertices_.push_back(0.0);
-	m_vertices_.push_back(5.0);
+	
 	
 	
 	// 加入法向量并且根据法向量生成颜色

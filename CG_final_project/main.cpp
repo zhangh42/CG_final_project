@@ -121,9 +121,10 @@ void init()
 {
 	// ¶¥µãÉú³É
 	// todo here
-	m_model.draw_grass("texture/seamless_grass.jpg");
+	m_model.draw_grass("texture/grass.jpg");
 	//m_model.draw_floor();
-	m_model.draw_cube(red);
+	//m_model.draw_cube(red);
+	m_model.draw_lamb();
 	points = m_model.get_points();
 	colors = m_model.get_colors();
 
@@ -169,7 +170,7 @@ void init()
 	glEnable(GL_LIGHTING);
 	//glDepthFunc(GL_LESS);
 	//glEnable(GL_CULL_FACE);
-	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClearColor(0.0, 0.0, 0.250, 1.0);
 }
 
 

@@ -5,6 +5,7 @@
 #include <string>
 #include "mesh.h"
 #include "Mesh_Painter.h"
+#include "include\TriMesh.h"
 using std::vector;
 using std::string;
 
@@ -46,13 +47,14 @@ private:
 	textureVec uvs;
 	int pointSize;
 	int colorSize;
-
+	TriMesh m_TriMesh;
 	Mesh_Painter m_mp;
 
 	// 正方体的一个面
 	void quad(int a, int b, int c, int d, color4 color);
 public:
 	My_Model();
+	void draw_lamb();
 	void draw_cube(color4 color);
 	void draw_floor();
 	pointVec get_points();

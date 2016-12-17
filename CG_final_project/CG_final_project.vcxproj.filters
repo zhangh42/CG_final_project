@@ -44,6 +44,9 @@
     <None Include="f_texture.glsl">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="sphere.off">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyModel.h">
@@ -58,6 +61,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="texture\seamless_grass.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="texture\grass.jpg">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

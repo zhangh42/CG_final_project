@@ -19,6 +19,24 @@ My_Model::My_Model()
 {
 }
 
+void My_Model::draw_lamb()
+{
+	m_TriMesh.read_off("sphere.off");
+	auto v = m_TriMesh.v();
+	auto f = m_TriMesh.f();
+
+	for (int i = 0;i < f.size();i++)
+	{
+		points.push_back(point4(v[f[i].a]) + point4(0, 3, -3, 0));
+		points.push_back(point4(v[f[i].b]) + point4(0, 3, -3, 0));
+		points.push_back(point4(v[f[i].c]) + point4(0, 3, -3, 0));
+
+		colors.push_back(yellow);
+		colors.push_back(yellow);
+		colors.push_back(yellow);
+	}
+}
+
 // 绘制边长为1的正方体
 void My_Model::draw_cube(color4 color)
 {
