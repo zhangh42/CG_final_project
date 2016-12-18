@@ -16,13 +16,48 @@ My_Model m_model;
 GLuint ModelView;
 GLuint Projection;
 GLuint program;
+GLuint draw_color;
 GLuint vao;
 
 vector<point4> points;
 vector<color4> colors;
 
-mat4 modelViewMat(1.0);
-mat4 projectionMat(1.0);
+mat4 modelView(1.0);
+mat4 projection;
+
+// Set up menu item indices, which we can alos use with the joint angles
+enum {
+	Torso,
+	Head1,
+	Head2,
+	RightUpperArm,
+	RightLowerArm,
+	LeftUpperArm,
+	LeftLowerArm,
+	RightUpperLeg,
+	RightLowerLeg,
+	LeftUpperLeg,
+	LeftLowerLeg,
+	NumJointAngles,
+	Quit
+};
+
+// Joint angles with initial values
+GLfloat theta[NumJointAngles] = {
+	0.0,    // Torso
+	0.0,    // Head1
+	0.0,    // Head2
+	0.0,    // RightUpperArm
+	0.0,    // RightLowerArm
+	0.0,    // LeftUpperArm
+	0.0,    // LeftLowerArm
+	180.0,  // RightUpperLeg
+	0.0,    // RightLowerLeg
+	180.0,  // LeftUpperLeg
+	0.0     // LeftLowerLeg
+};
+
+GLint angle = Head2;
 
 // 旋转角度大小
 const float THETA = 2.0;
@@ -34,35 +69,6 @@ enum {
 	Z_axis = 2
 };
 
-// 矩阵栈
-class MatrixStack {
-	int    _index;
-	int    _size;
-	mat4*  _matrices;
-
-public:
-	MatrixStack(int numMatrices = 100) :_index(0), _size(numMatrices)
-	{
-		_matrices = new mat4[numMatrices];
-	}
-
-	~MatrixStack()
-	{
-		delete[]_matrices;
-	}
-
-	void push(const mat4& m) {
-		assert(_index + 1 < _size);
-		_matrices[_index++] = m;
-
-	}
-
-	mat4& pop(void) {
-		assert(_index - 1 >= 0);
-		_index--;
-		return _matrices[_index];
-	}
-};
 
 // 相机参数设置
 namespace Camera
@@ -123,7 +129,7 @@ void init()
 	// todo here
 	m_model.draw_grass("texture/grass.jpg");
 	//m_model.draw_floor();
-	//m_model.draw_cube(red);
+	m_model.draw_cube(red);
 	m_model.draw_lamb();
 	points = m_model.get_points();
 	colors = m_model.get_colors();
@@ -160,14 +166,15 @@ void init()
 		BUFFER_OFFSET(sizeof(point4) * points.size()));
 
 	ModelView = glGetUniformLocation(program, "ModelView");
-	Projection = glGetUniformLocation(program, "Projection");	
+	Projection = glGetUniformLocation(program, "Projection");
+	draw_color = glGetUniformLocation(program, "draw_color");
 	//glUseProgram(0);
 
 	// 开启深度测试
 	glEnable(GL_DEPTH_TEST);
 	// 这些作用未知 ？？
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable(GL_LIGHTING);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glEnable(GL_LIGHTING);
 	//glDepthFunc(GL_LESS);
 	//glEnable(GL_CULL_FACE);
 	glClearColor(0.0, 0.0, 0.250, 1.0);
@@ -186,11 +193,13 @@ void display()
 	glUseProgram(program);
 	glBindVertexArray(vao);
 
-	modelViewMat = RotateX(rotationAngle[X_axis]) * Translate(0, 0.5, -1.5);
-	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelViewMat);
-	glDrawArrays(GL_TRIANGLES, 0, points.size()); 
+	modelView = RotateX(rotationAngle[X_axis]) * Translate(0, 4.5, -3.5);
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView);
+	// 绘制颜色
+	glUniform4fv(draw_color, 1, yellow);
+	glDrawArrays(GL_TRIANGLES, 36, points.size()); 
 
-	//glUniformMatrix4fv(Projection, 1, GL_TRUE, projectionMat);
+	m_model.draw_human();
 
 	glutSwapBuffers();
 }
@@ -223,11 +232,11 @@ void reshape(int width, int height)
 		radius*sin(theta)*sin(phi),
 		radius*cos(theta),
 		1.0);*/
-	point4 eye(0, 1.0, 1, 1.0);
+	point4 eye(0, 0.50, 1.0, 1.0);
 	point4  at(0.0, 0.0, 0.0, 1.0);
 	vec4    up(0.0, 1.0, -1.0, 0.0);
 
-	mat4 projection = Ortho(-3, 3, 0, 6, -3, 6) * Camera::lookAt(eye, at, up);
+	projection = Ortho(-3, 3, 0, 6, -3, 6) * Camera::lookAt(eye, at, up);
 	glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
 
 	//model_view = mat4(1.0);   // An Identity matrix

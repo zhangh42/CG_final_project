@@ -1,6 +1,150 @@
 #include "MyModel.h"
 
+enum {
+	Torso,
+	Head1,
+	Head2,
+	RightUpperArm,
+	RightLowerArm,
+	LeftUpperArm,
+	LeftLowerArm,
+	RightUpperLeg,
+	RightLowerLeg,
+	LeftUpperLeg,
+	LeftLowerLeg,
+	NumJointAngles,
+	Quit
+};
 
+void
+torso()
+{
+	// mvstack.push( model_view );//保存父节点矩阵
+
+	mat4 instance = (Translate(0.0, 0.5 * TORSO_HEIGHT, 0.0) *
+		Scale(TORSO_WIDTH, TORSO_HEIGHT, TORSO_WIDTH));//本节点局部变换矩阵
+
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, blue);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	//glUniform4fv(draw_color, 1, color_torso);
+	// model_view = mvstack.pop();//恢复父节点矩阵
+}
+
+void
+head()
+{
+	mat4 instance = (Translate(0.0, 0.5 * HEAD_HEIGHT, 0.0) *
+		Scale(HEAD_WIDTH, HEAD_HEIGHT, HEAD_WIDTH));//本节点局部变换矩阵
+
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, cyan);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+}
+
+void
+neck()
+{
+	mat4 instance = (Translate(0.0, 0.5 * NECK_HEIGHT, 0.0) *
+		Scale(NECK_WIDTH, NECK_HEIGHT, NECK_WIDTH));//本节点局部变换矩阵
+
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, cyan);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	//glUniform4fv(draw_color, 1, color_torso);
+}
+
+void hair()
+{
+	mat4 instance = (Translate(0.0, 0.5 * HAIR_HEIGHT, 0.0) *
+		Scale(HAIR_WIDTH, HAIR_HEIGHT, HAIR_WIDTH));//本节点局部变换矩阵
+
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, black);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+	//glUniform4fv(draw_color, 1, color_torso);
+}
+
+void
+left_upper_arm()
+{
+	mat4 instance = (Translate(0.0, 0.5 * UPPER_ARM_HEIGHT, 0.0) *
+		Scale(UPPER_ARM_WIDTH, UPPER_ARM_HEIGHT, UPPER_ARM_WIDTH));//本节点局部变换矩阵
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, OliveDrab);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+}
+
+void
+left_lower_arm()
+{
+	mat4 instance = (Translate(0.0, 0.5 * LOWER_ARM_HEIGHT, 0.0) *
+		Scale(LOWER_ARM_WIDTH, LOWER_ARM_HEIGHT, LOWER_ARM_WIDTH));//本节点局部变换矩阵
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, black);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+}
+
+void
+right_upper_arm()
+{
+	mat4 instance = (Translate(0.0, 0.5 * UPPER_ARM_HEIGHT, 0.0) *
+		Scale(UPPER_ARM_WIDTH, UPPER_ARM_HEIGHT, UPPER_ARM_WIDTH));//本节点局部变换矩阵
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, OliveDrab);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+}
+
+void
+right_lower_arm()
+{
+	mat4 instance = (Translate(0.0, 0.5 * LOWER_ARM_HEIGHT, 0.0) *
+		Scale(LOWER_ARM_WIDTH, LOWER_ARM_HEIGHT, LOWER_ARM_WIDTH));//本节点局部变换矩阵
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, black);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+}
+
+void
+left_upper_leg()
+{
+	mat4 instance = (Translate(0.0, 0.5 * UPPER_LEG_HEIGHT, 0.0) *
+		Scale(UPPER_LEG_WIDTH, UPPER_LEG_HEIGHT, UPPER_LEG_WIDTH));//本节点局部变换矩阵
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, black);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+}
+
+void
+left_lower_leg()
+{
+	mat4 instance = (Translate(0.0, 0.5 * LOWER_LEG_HEIGHT, 0.0) *
+		Scale(LOWER_LEG_WIDTH, LOWER_LEG_HEIGHT, LOWER_LEG_WIDTH));//本节点局部变换矩阵
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, black);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+}
+
+void
+right_upper_leg()
+{
+	mat4 instance = (Translate(0.0, 0.5 * UPPER_LEG_HEIGHT, 0.0) *
+		Scale(UPPER_LEG_WIDTH, UPPER_LEG_HEIGHT, UPPER_LEG_WIDTH));//本节点局部变换矩阵
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, black);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+}
+
+void
+right_lower_leg()
+{
+	mat4 instance = (Translate(0.0, 0.5 * LOWER_LEG_HEIGHT, 0.0) *
+		Scale(LOWER_LEG_WIDTH, LOWER_LEG_HEIGHT, LOWER_LEG_WIDTH));//本节点局部变换矩阵
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
+	glUniform4fv(draw_color, 1, black);
+	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
+}
 
 // 正方体的一个面
 void My_Model::quad(int a, int b, int c, int d, color4 color)
@@ -27,9 +171,9 @@ void My_Model::draw_lamb()
 
 	for (int i = 0;i < f.size();i++)
 	{
-		points.push_back(point4(v[f[i].a]) + point4(0, 3, -3, 0));
-		points.push_back(point4(v[f[i].b]) + point4(0, 3, -3, 0));
-		points.push_back(point4(v[f[i].c]) + point4(0, 3, -3, 0));
+		points.push_back(point4(v[f[i].a]));
+		points.push_back(point4(v[f[i].b]));
+		points.push_back(point4(v[f[i].c]));
 
 		colors.push_back(yellow);
 		colors.push_back(yellow);
@@ -84,6 +228,50 @@ colorVec My_Model::get_colors()
 
 void My_Model::draw_human()
 {
+	MatrixStack mvstack;
+	mvstack.push(modelView);
+	modelView = RotateY(theta[Torso]) * Translate(0,0.5,-3.0) ;//躯干变换矩阵
+	torso();//躯干绘制
+
+	mvstack.push(modelView);//保存躯干变换矩阵
+	modelView *= Translate(0, TORSO_HEIGHT, 0);
+	neck();//脖子绘制
+	modelView *= Translate(0, NECK_HEIGHT, 0) * RotateY(theta[Head1]);
+	head();//头部绘制
+	modelView *= Translate(0, HEAD_HEIGHT, 0);
+	hair();//头部绘制
+	modelView = mvstack.pop();//恢复躯干变换矩阵
+
+	mvstack.push(modelView); //保存躯干变换矩阵
+	modelView *= Translate(-0.5*TORSO_WIDTH - 0.5*UPPER_ARM_WIDTH, TORSO_HEIGHT, 0) * RotateX(theta[LeftUpperArm]);
+	left_upper_arm();//左上臂绘制
+	modelView *= Translate(0, UPPER_ARM_HEIGHT, 0) * RotateX(theta[LeftLowerArm]);
+	left_lower_arm();//左下臂绘制
+	modelView = mvstack.pop();//恢复躯干变换矩阵
+
+	mvstack.push(modelView); //保存躯干变换矩阵
+	modelView *= Translate(0.5*TORSO_WIDTH + 0.5*UPPER_ARM_WIDTH, TORSO_HEIGHT, 0) * RotateX(theta[RightUpperArm]);
+	right_upper_arm();//右上臂绘制
+	modelView *= Translate(0, UPPER_ARM_HEIGHT, 0) * RotateX(theta[RightLowerArm]);
+	right_lower_arm();//右下臂绘制
+	modelView = mvstack.pop();//恢复躯干变换矩阵
+
+	mvstack.push(modelView); //保存躯干变换矩阵
+	modelView *= Translate(-0.25*TORSO_WIDTH, 0, 0) * RotateX(theta[LeftUpperLeg]);
+	left_upper_leg();//左上腿绘制
+	modelView *= Translate(0, UPPER_LEG_HEIGHT, 0) *
+		RotateX(theta[LeftLowerLeg]);
+	left_lower_leg();//左下腿绘制
+	modelView = mvstack.pop();//恢复躯干变换矩阵
+
+	mvstack.push(modelView); //保存躯干变换矩阵
+	modelView *= Translate(0.25*TORSO_WIDTH, 0, 0) * RotateX(theta[RightUpperLeg]);
+	right_upper_leg();//右上腿绘制
+	modelView *= Translate(0, UPPER_LEG_HEIGHT, 0) *
+		RotateX(theta[RightLowerLeg]);
+	right_lower_leg();//右下腿绘制
+
+	modelView = mvstack.pop();//恢复父节点矩阵
 }
 
 void My_Model::draw_grass(string texture_file_name)

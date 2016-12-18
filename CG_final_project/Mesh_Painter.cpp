@@ -1,6 +1,8 @@
 #include "Mesh_Painter.h"
 #include "FreeImage.h"
 
+extern mat4 projection;
+
 mat4 lookAt(const vec4& eye, const vec4& at, const vec4& up)
 {
 	vec4 n = normalize(eye - at);
@@ -43,10 +45,6 @@ void Mesh_Painter::draw_meshes()
 		GLfloat  vTranslation[3] = { x, y, z };
 		glUniform3fv(trans_all[i], 1, vTranslation);
 
-		vec4 eye(0, 1.0, 1, 1.0);
-		vec4  at(0.0, 0.0, 0.0, 1.0);
-		vec4    up(0.0, 1.0, -1.0, 0.0);
-		mat4 projection = Ortho(-3, 3, 0, 6, -3, 6) * lookAt(eye, at, up);
 		glUniformMatrix4fv(proj_all[i], 1, GL_TRUE, projection);
 
 		glDrawArrays(GL_TRIANGLES, 0, this->m_my_meshes_[i]->num_faces() * 3);
