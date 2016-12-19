@@ -178,6 +178,10 @@ void My_Model::draw_lamb()
 		colors.push_back(yellow);
 		colors.push_back(yellow);
 		colors.push_back(yellow);
+
+		normals.push_back(point4(v[f[i].a]));
+		normals.push_back(point4(v[f[i].b]));
+		normals.push_back(point4(v[f[i].c]));
 	}
 }
 
@@ -185,11 +189,17 @@ void My_Model::draw_lamb()
 void My_Model::draw_cube(color4 color)
 {
 	quad(0, 1, 2, 3, color);
+	for (int i = 0;i < 6;i++) normals.push_back(vec4(0, -1, 0, 0));
 	quad(4, 5, 6, 7, color);
+	for (int i = 0;i < 6;i++) normals.push_back(vec4(0, 1, 0, 0));
 	quad(0, 1, 4, 5, color);
+	for (int i = 0;i < 6;i++) normals.push_back(vec4(-1, 0, 0, 0));
 	quad(2, 3, 6, 7, color);
+	for (int i = 0;i < 6;i++) normals.push_back(vec4(1, 0, 0, 0));
 	quad(0, 2, 4, 6, color);
+	for (int i = 0;i < 6;i++) normals.push_back(vec4(0, 0, -1, 0));
 	quad(1, 3, 5, 7, color);
+	for (int i = 0;i < 6;i++) normals.push_back(vec4(0, 0, 1, 0));
 
 	pointSize += 36;
 	colorSize += 36;
@@ -230,7 +240,8 @@ void My_Model::draw_human()
 {
 	MatrixStack mvstack;
 	mvstack.push(modelView);
-	modelView = RotateY(theta[Torso]) * Translate(0,0.5,-3.0) ;//Çû¸É±ä»»¾ØÕó
+	//std::cout << modelView << std::endl;
+	modelView *= RotateY(theta[Torso]);//Çû¸É±ä»»¾ØÕó
 	torso();//Çû¸É»æÖÆ
 
 	mvstack.push(modelView);//±£´æÇû¸É±ä»»¾ØÕó

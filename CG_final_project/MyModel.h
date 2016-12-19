@@ -71,6 +71,7 @@ class My_Model
 private:
 	pointVec points;
 	colorVec colors;
+	pointVec normals;
 	textureVec uvs;
 	int pointSize;
 	int colorSize;

@@ -15,15 +15,19 @@ My_Model m_model;
 
 GLuint ModelView;
 GLuint Projection;
+GLuint LightPos;
 GLuint program;
 GLuint draw_color;
 GLuint vao;
 
 vector<point4> points;
 vector<color4> colors;
+vector<point4> normals;
 
 mat4 modelView(1.0);
 mat4 projection;
+
+vec3 lightPos(0, 4, -3.5);
 
 // Set up menu item indices, which we can alos use with the joint angles
 enum {
@@ -165,9 +169,17 @@ void init()
 	glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0,
 		BUFFER_OFFSET(sizeof(point4) * points.size()));
 
+	// 法向量
+	GLuint vNormal = glGetAttribLocation(program, "vNormal");
+	glEnableVertexAttribArray(vNormal);
+	glVertexAttribPointer(vNormal, 4, GL_FLOAT, GL_FALSE, 0,
+		BUFFER_OFFSET(sizeof(point4) * normals.size()));
+
+
 	ModelView = glGetUniformLocation(program, "ModelView");
 	Projection = glGetUniformLocation(program, "Projection");
 	draw_color = glGetUniformLocation(program, "draw_color");
+	LightPos = glGetUniformLocation(program, "lightPos");
 	//glUseProgram(0);
 
 	// 开启深度测试
@@ -185,6 +197,9 @@ void init()
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	modelView = RotateY(rotationAngle[X_axis]);
+
 	/*modelViewMat = RotateX(rotationAngle[X_axis]);
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelViewMat);
 	glDrawArrays(GL_TRIANGLES, 0, 6);*/
@@ -193,12 +208,30 @@ void display()
 	glUseProgram(program);
 	glBindVertexArray(vao);
 
-	modelView = RotateX(rotationAngle[X_axis]) * Translate(0, 4.5, -3.5);
+	glUniform3fv(LightPos, 1, &lightPos[0]);
+
+	// 绘制月亮
+	modelView = Translate(0, 4.5, -3.5);
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView);
 	// 绘制颜色
 	glUniform4fv(draw_color, 1, yellow);
 	glDrawArrays(GL_TRIANGLES, 36, points.size()); 
 
+	// 绘制人
+	modelView = RotateY(rotationAngle[X_axis])*Translate(0, 0.5, -3.0);
+	m_model.draw_human();
+
+
+	// 计算阴影投影矩阵，绘制投影之后的三角形（用黑色表示）
+	mat4 shadowProjMatrix(
+		-lightPos[1], 0, 0, 0,
+		lightPos[0], 0, lightPos[2], 1,
+		0, 0, -lightPos[1], 0,
+		0, 0, 0, -lightPos[1]);
+	// 绘制人
+
+	modelView =shadowProjMatrix*Translate(0, 0.5, -3.0);
+	//modelView = RotateY(rotationAngle[X_axis])*Translate(-2, 0.5, -4.50);
 	m_model.draw_human();
 
 	glutSwapBuffers();
