@@ -27,7 +27,13 @@ vector<point4> normals;
 mat4 modelView(1.0);
 mat4 projection;
 
-vec3 lightPos(0, 4, -3.5);
+vec3 lightPos(0.5, 4, 1.5);
+// 计算阴影投影矩阵，绘制投影之后的三角形（用黑色表示）
+mat4 shadowProjMatrix(
+	-lightPos[1], 0, 0, 0,
+	lightPos[0], 0, lightPos[2], 1,
+	0, 0, -lightPos[1], 0,
+	0, 0, 0, -lightPos[1]);
 
 // Set up menu item indices, which we can alos use with the joint angles
 enum {
@@ -80,6 +86,8 @@ namespace Camera
 	/*mat4 modelMatrix(1.0);
 	mat4 viewMatrix(1.0);
 	mat4 projMatrix(1.0);*/
+	GLfloat angle = 0;
+	GLfloat height = 0.5;
 
 	mat4 ortho(const GLfloat left, const GLfloat right,
 		const GLfloat bottom, const GLfloat top,
@@ -124,7 +132,18 @@ namespace Camera
 	}
 }
 
-
+// 绘制一个含有阴影的球
+void draw_sphere(color4 color)
+{
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView);
+	glUniform4fv(draw_color, 1, color);	// 绘制颜色
+	glDrawArrays(GL_TRIANGLES, 36, points.size());
+	// 绘制阴影
+	modelView = shadowProjMatrix * modelView;
+	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView);
+	glUniform4fv(draw_color, 1, black);
+	glDrawArrays(GL_TRIANGLES, 36, points.size());
+}
 
 // 初始化函数，初始化一些参数信息
 void init()
@@ -132,16 +151,16 @@ void init()
 	// 顶点生成
 	// todo here
 	m_model.draw_grass("texture/grass.jpg");
-	//m_model.draw_floor();
-	m_model.draw_cube(red);
-	m_model.draw_lamb();
+	m_model.draw_wawa("texture/wawa.obj");
+
+	m_model.init_cube(red);
+	m_model.init_sphere();
 	points = m_model.get_points();
 	colors = m_model.get_colors();
 
 
 
 	// Create a vertex array object
-	vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
@@ -186,8 +205,8 @@ void init()
 	glEnable(GL_DEPTH_TEST);
 	// 这些作用未知 ？？
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//glEnable(GL_LIGHTING);
-	//glDepthFunc(GL_LESS);
+	glEnable(GL_LIGHTING);
+	glDepthFunc(GL_LESS);
 	//glEnable(GL_CULL_FACE);
 	glClearColor(0.0, 0.0, 0.250, 1.0);
 }
@@ -197,13 +216,14 @@ void init()
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	modelView = RotateY(rotationAngle[X_axis]);
+	modelView = mat4(1.0);
 
 	/*modelViewMat = RotateX(rotationAngle[X_axis]);
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelViewMat);
 	glDrawArrays(GL_TRIANGLES, 0, 6);*/
 	m_model.draw_mesh();
+	modelView = Translate(0, 0, -2) * RotateX(-90) * Scale(0.8, 0.8, 0.8);
+	m_model.draw_obj_mesh();
 
 	glUseProgram(program);
 	glBindVertexArray(vao);
@@ -217,20 +237,26 @@ void display()
 	glUniform4fv(draw_color, 1, yellow);
 	glDrawArrays(GL_TRIANGLES, 36, points.size()); 
 
+
+	// 画个绿色的球
+	modelView = Translate(-3, 0.5, -2.5);
+	draw_sphere(blue);
+
+	modelView = Scale(1.5, 1.5, 1.5) * Translate(1, 0.5, 1.5);
+	draw_sphere(magenta);
+
+	modelView = Scale(1.5, 1.5, 1.5) * Translate(1.5, 0.5, 0);
+	draw_sphere(cyan);
+
 	// 绘制人
-	modelView = RotateY(rotationAngle[X_axis])*Translate(0, 0.5, -3.0);
+	modelView = Translate(0, 0.5, -0.0);
 	m_model.draw_human();
 
 
-	// 计算阴影投影矩阵，绘制投影之后的三角形（用黑色表示）
-	mat4 shadowProjMatrix(
-		-lightPos[1], 0, 0, 0,
-		lightPos[0], 0, lightPos[2], 1,
-		0, 0, -lightPos[1], 0,
-		0, 0, 0, -lightPos[1]);
+
 	// 绘制人
 
-	modelView =shadowProjMatrix*Translate(0, 0.5, -3.0);
+	modelView =shadowProjMatrix*Translate(0, 0.5, -0.0);
 	//modelView = RotateY(rotationAngle[X_axis])*Translate(-2, 0.5, -4.50);
 	m_model.draw_human();
 
@@ -258,18 +284,19 @@ void reshape(int width, int height)
 		top /= aspect;
 	}
 
-	GLfloat radius = 1.0;
-	GLfloat theta = 3.1415 / 4;
-	GLfloat phi = 3.1415 / 2;
-	/*point4  eye(radius*sin(theta)*cos(phi),
+	/*GLfloat radius = 1.0;
+	GLfloat theta = 0;
+	GLfloat phi = 3.14/6;
+	point4  eye(radius*sin(theta)*cos(phi),
 		radius*sin(theta)*sin(phi),
 		radius*cos(theta),
 		1.0);*/
-	point4 eye(0, 0.50, 1.0, 1.0);
+	point4 eye(0.0, 0.50, 1.0, 1.0);
 	point4  at(0.0, 0.0, 0.0, 1.0);
-	vec4    up(0.0, 1.0, -1.0, 0.0);
+	vec4    up(0.0, 1.0, 0.0, 0.0);
 
-	projection = Ortho(-3, 3, 0, 6, -3, 6) * Camera::lookAt(eye, at, up);
+//	projection = Ortho(-10, 10, -10, 10, -10, 10) * Camera::lookAt(eye, at, up);
+	projection = Ortho(-6, 6, -2, 10, -6, 6) * Camera::lookAt(eye, at, up);
 	glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
 
 	//model_view = mat4(1.0);   // An Identity matrix
@@ -290,18 +317,25 @@ void keyboard(unsigned char key, int x, int y)
 // 菜单函数
 void menu(int option)
 {
-	
+	if (option == Quit) {
+		exit(EXIT_SUCCESS);
+	}
+
+	angle = option;
 }
 
 // 鼠标的三个键的相应函数
 void mouse(int button, int state, int x, int y)
 {
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		
-	}else if (button == GLUT_MIDDLE_BUTTON && state == GLUT_DOWN) {
-
-	}else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
-		
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) 
+	{
+		theta[angle] += 5.0;
+		if (theta[angle] > 360.0) { theta[angle] -= 360.0; }
+	}
+	else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) 
+	{
+		theta[angle] -= 5.0;
+		if (theta[angle] < 0.0) { theta[angle] += 360.0; }
 	}
 
 	// 调用display函数，刷新界面
@@ -325,6 +359,25 @@ void specialKeyboard(int key, int x, int y)
 	glutPostRedisplay();
 }
 
+// 鼠标菜单函数
+void createMenu()
+{
+	glutCreateMenu(menu);
+	glutAddMenuEntry("torso", Torso);
+	glutAddMenuEntry("head1", Head1);
+//	glutAddMenuEntry("head2", Head2);
+	glutAddMenuEntry("right_upper_arm", RightUpperArm);
+	glutAddMenuEntry("right_lower_arm", RightLowerArm);
+	glutAddMenuEntry("left_upper_arm", LeftUpperArm);
+	glutAddMenuEntry("left_lower_arm", LeftLowerArm);
+	glutAddMenuEntry("right_upper_leg", RightUpperLeg);
+	glutAddMenuEntry("right_lower_leg", RightLowerLeg);
+	glutAddMenuEntry("left_upper_leg", LeftUpperLeg);
+	glutAddMenuEntry("left_lower_leg", LeftLowerLeg);
+	glutAddMenuEntry("quit", Quit);
+	glutAttachMenu(GLUT_MIDDLE_BUTTON);
+}
+
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
@@ -344,6 +397,7 @@ int main(int argc, char **argv)
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
 	glutSpecialFunc(specialKeyboard);
+	createMenu();
 
 	glutMainLoop();
 	return 0;

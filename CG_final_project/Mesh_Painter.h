@@ -1,5 +1,9 @@
 #pragma once
 #include "mesh.h"
+
+extern mat4 projection;
+extern mat4 modelView;
+
 class Mesh_Painter
 {
 public:
@@ -14,7 +18,12 @@ public:
 	void add_mesh(My_Mesh*);
 	void clear_mehs();
 
+	void update_obj_vertex_buffer();
+
 private:
+
+	// ÐÂ¼Ó
+	std::vector<GLuint> ModelView_all;
 
 	void load_texture_FreeImage(std::string file_name, GLuint& m_texName);
 	std::vector<GLuint> program_all;

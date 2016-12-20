@@ -32,8 +32,7 @@ torso()
 	// model_view = mvstack.pop();//恢复父节点矩阵
 }
 
-void
-head()
+void head()
 {
 	mat4 instance = (Translate(0.0, 0.5 * HEAD_HEIGHT, 0.0) *
 		Scale(HEAD_WIDTH, HEAD_HEIGHT, HEAD_WIDTH));//本节点局部变换矩阵
@@ -43,8 +42,7 @@ head()
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 }
 
-void
-neck()
+void neck()
 {
 	mat4 instance = (Translate(0.0, 0.5 * NECK_HEIGHT, 0.0) *
 		Scale(NECK_WIDTH, NECK_HEIGHT, NECK_WIDTH));//本节点局部变换矩阵
@@ -66,8 +64,7 @@ void hair()
 	//glUniform4fv(draw_color, 1, color_torso);
 }
 
-void
-left_upper_arm()
+void left_upper_arm()
 {
 	mat4 instance = (Translate(0.0, 0.5 * UPPER_ARM_HEIGHT, 0.0) *
 		Scale(UPPER_ARM_WIDTH, UPPER_ARM_HEIGHT, UPPER_ARM_WIDTH));//本节点局部变换矩阵
@@ -76,8 +73,7 @@ left_upper_arm()
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 }
 
-void
-left_lower_arm()
+void left_lower_arm()
 {
 	mat4 instance = (Translate(0.0, 0.5 * LOWER_ARM_HEIGHT, 0.0) *
 		Scale(LOWER_ARM_WIDTH, LOWER_ARM_HEIGHT, LOWER_ARM_WIDTH));//本节点局部变换矩阵
@@ -86,8 +82,7 @@ left_lower_arm()
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 }
 
-void
-right_upper_arm()
+void right_upper_arm()
 {
 	mat4 instance = (Translate(0.0, 0.5 * UPPER_ARM_HEIGHT, 0.0) *
 		Scale(UPPER_ARM_WIDTH, UPPER_ARM_HEIGHT, UPPER_ARM_WIDTH));//本节点局部变换矩阵
@@ -96,8 +91,7 @@ right_upper_arm()
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 }
 
-void
-right_lower_arm()
+void right_lower_arm()
 {
 	mat4 instance = (Translate(0.0, 0.5 * LOWER_ARM_HEIGHT, 0.0) *
 		Scale(LOWER_ARM_WIDTH, LOWER_ARM_HEIGHT, LOWER_ARM_WIDTH));//本节点局部变换矩阵
@@ -106,8 +100,7 @@ right_lower_arm()
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 }
 
-void
-left_upper_leg()
+void left_upper_leg()
 {
 	mat4 instance = (Translate(0.0, 0.5 * UPPER_LEG_HEIGHT, 0.0) *
 		Scale(UPPER_LEG_WIDTH, UPPER_LEG_HEIGHT, UPPER_LEG_WIDTH));//本节点局部变换矩阵
@@ -116,8 +109,7 @@ left_upper_leg()
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 }
 
-void
-left_lower_leg()
+void left_lower_leg()
 {
 	mat4 instance = (Translate(0.0, 0.5 * LOWER_LEG_HEIGHT, 0.0) *
 		Scale(LOWER_LEG_WIDTH, LOWER_LEG_HEIGHT, LOWER_LEG_WIDTH));//本节点局部变换矩阵
@@ -126,8 +118,7 @@ left_lower_leg()
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 }
 
-void
-right_upper_leg()
+void right_upper_leg()
 {
 	mat4 instance = (Translate(0.0, 0.5 * UPPER_LEG_HEIGHT, 0.0) *
 		Scale(UPPER_LEG_WIDTH, UPPER_LEG_HEIGHT, UPPER_LEG_WIDTH));//本节点局部变换矩阵
@@ -136,8 +127,7 @@ right_upper_leg()
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 }
 
-void
-right_lower_leg()
+void right_lower_leg()
 {
 	mat4 instance = (Translate(0.0, 0.5 * LOWER_LEG_HEIGHT, 0.0) *
 		Scale(LOWER_LEG_WIDTH, LOWER_LEG_HEIGHT, LOWER_LEG_WIDTH));//本节点局部变换矩阵
@@ -163,7 +153,8 @@ My_Model::My_Model()
 {
 }
 
-void My_Model::draw_lamb()
+// 初始化球的顶点数据
+void My_Model::init_sphere()
 {
 	m_TriMesh.read_off("sphere.off");
 	auto v = m_TriMesh.v();
@@ -185,8 +176,9 @@ void My_Model::draw_lamb()
 	}
 }
 
+
 // 绘制边长为1的正方体
-void My_Model::draw_cube(color4 color)
+void My_Model::init_cube(color4 color)
 {
 	quad(0, 1, 2, 3, color);
 	for (int i = 0;i < 6;i++) normals.push_back(vec4(0, -1, 0, 0));
@@ -206,25 +198,25 @@ void My_Model::draw_cube(color4 color)
 }
 
 // 绘制地板
-void My_Model::draw_floor()
-{
-	point4 p1(-10, 0, -10, 1.0);
-	point4 p2(-10, 0, 10, 1.0);
-	point4 p3(10, 0, -10, 1.0);
-	point4 p4(10, 0, 10, 1.0);
-
-	points.push_back(p1);
-	points.push_back(p2);
-	points.push_back(p3);
-	points.push_back(p2);
-	points.push_back(p3);
-	points.push_back(p4);
-	for (int i = 0;i < 6;i++)
-		colors.push_back(green);
-
-	pointSize += 6;
-	colorSize += 6;
-}
+//void My_Model::draw_floor()
+//{
+//	point4 p1(-10, 0, -10, 1.0);
+//	point4 p2(-10, 0, 10, 1.0);
+//	point4 p3(10, 0, -10, 1.0);
+//	point4 p4(10, 0, 10, 1.0);
+//
+//	points.push_back(p1);
+//	points.push_back(p2);
+//	points.push_back(p3);
+//	points.push_back(p2);
+//	points.push_back(p3);
+//	points.push_back(p4);
+//	for (int i = 0;i < 6;i++)
+//		colors.push_back(green);
+//
+//	pointSize += 6;
+//	colorSize += 6;
+//}
 
 pointVec My_Model::get_points()
 {
@@ -314,4 +306,26 @@ int My_Model::get_colors_size()
 void My_Model::draw_mesh()
 {
 	m_mp.draw_meshes();
+}
+
+void My_Model::draw_obj_mesh()
+{
+	m_obj_mp.draw_meshes();
+}
+
+void My_Model::draw_wawa(string objFile)
+{
+	
+	My_Mesh* my_mesh1 = new My_Mesh;
+	my_mesh1->isObjMesh = true;
+	my_mesh1->load_obj(objFile);
+	my_mesh1->set_texture_file("texture/wawa.png");
+	my_mesh1->set_translate(0.5, 0, 0);
+	my_mesh1->set_theta(90, 0., 0.);
+	my_mesh1->set_theta_step(0, 1, 0);	
+	m_obj_mp.add_mesh(my_mesh1);
+
+	m_obj_mp.init_shaders("v_texture.glsl", "f_texture.glsl");
+	m_obj_mp.update_obj_vertex_buffer();
+	m_obj_mp.update_texture();
 }

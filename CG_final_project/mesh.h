@@ -47,6 +47,8 @@ class My_Mesh
 public:
 	My_Mesh();
 	~My_Mesh();
+	bool isObjMesh = false;
+	void load_obj(std::string obj_File);
 
 	void set_texture_file(std::string s);
 	std::string get_texture_file();
@@ -58,6 +60,7 @@ public:
 	const VtList&   get_vts();
 
 	int num_faces();
+	int obj_num_faces();
 	int num_vertices();
 
 	const point3f& get_center();

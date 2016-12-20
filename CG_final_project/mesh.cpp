@@ -67,8 +67,13 @@ const FaceList&   My_Mesh::get_faces()
 
 int My_Mesh::num_faces()
 {
+	// obj文件需要特殊处理
+	if (isObjMesh)
+		return this->m_faces_.size() / 3 / 3;
 	return this->m_faces_.size()/3;
 };
+
+
 int My_Mesh::num_vertices()
 {
 	return this->m_vertices_.size()/3;
@@ -87,21 +92,21 @@ void My_Mesh::generate_floor()
 	//this->m_min_box_ = point3f(-3, 0, -3);
 	//this->m_max_box_ = point3f(3, 6, 3);
 
-	m_vertices_.push_back(-4.0);
+	m_vertices_.push_back(-6.0);
 	m_vertices_.push_back(0.0);
-	m_vertices_.push_back(5.0);
+	m_vertices_.push_back(6.0);
 
-	m_vertices_.push_back(4.0);
+	m_vertices_.push_back(6.0);
 	m_vertices_.push_back(0.0);
-	m_vertices_.push_back(5.0);
+	m_vertices_.push_back(6.0);
 
-	m_vertices_.push_back(-4.0);
+	m_vertices_.push_back(-6.0);
 	m_vertices_.push_back(0.0);
-	m_vertices_.push_back(-5.0);	
+	m_vertices_.push_back(-6.0);	
 
-	m_vertices_.push_back(4.0);
+	m_vertices_.push_back(6.0);
 	m_vertices_.push_back(0.0);
-	m_vertices_.push_back(-5.0);
+	m_vertices_.push_back(-6.0);
 
 	
 	
@@ -144,6 +149,72 @@ void My_Mesh::generate_floor()
 		m_vt_list_.push_back(1.0);
 		m_vt_list_.push_back(1.0);
 		m_vt_list_.push_back(1.0);
+};
+
+// 导入娃娃obj
+void My_Mesh::load_obj(std::string obj_File)
+{
+	//请在此添加代码实现对含有UV坐标的obj文件的读取
+	std::ifstream infile(obj_File);
+	std::string line;
+	while (std::getline(infile, line))
+	{
+		std::istringstream iss(line);
+		std::string type;
+		int xi, yi, zi;
+		GLfloat x, y, z;
+		iss >> type;
+		// 注释信息
+		if (type == "#")
+			continue;
+		else if (type == "v")
+		{
+			// 顶点坐标
+			iss >> x >> y >> z;
+			m_vertices_.push_back(x);
+			m_vertices_.push_back(y);
+			m_vertices_.push_back(z);
+		}
+		// 片面信息
+		else if (type == "f")
+		{
+			// 三角形片面的三个顶点的坐标索引
+			char t;
+			for (int i = 0;i < 3;i++)
+			{
+				iss >> xi >> t >> yi >> t >> zi;
+				// 这里预先减一是因为数组是从0开始的
+				m_faces_.push_back(xi - 1);
+				m_faces_.push_back(yi - 1);
+				m_faces_.push_back(zi - 1);
+			}
+		}
+		// 法线和颜色
+		else if (type == "vn")
+		{
+			iss >> x >> y >> z;
+			m_normals_.push_back(x);
+			m_normals_.push_back(y);
+			m_normals_.push_back(z);
+
+			//这里采用法线来生成颜色，可以自定义自己的颜色生成方式
+			float r;
+			float g;
+			float b;
+			My_Mesh::normal_to_color(x, y, z, r, g, b);
+			m_color_list_.push_back(r);
+			m_color_list_.push_back(g);
+			m_color_list_.push_back(b);
+		}
+		// 读取uv坐标
+		else if (type == "vt")
+		{
+			iss >> x >> y;
+			m_vt_list_.push_back(x);
+			m_vt_list_.push_back(y);
+		}
+	}
+
 };
 
 void My_Mesh::set_texture_file(std::string s)
@@ -195,3 +266,5 @@ void My_Mesh::add_theta_step()
 	Theta[1] = Theta[1] + Theta_step[1];
 	Theta[2] = Theta[2] + Theta_step[2];
 };
+
+

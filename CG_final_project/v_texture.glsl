@@ -13,11 +13,13 @@ out vec4 normal;
 
 uniform vec3 theta;
 uniform vec3 translation;
+uniform mat4 modelView;
 uniform mat4 projection;
 
 void main()
 {
-    const float  DegreesToRadians = 3.14159265 / 180.0;
+
+	const float  DegreesToRadians = 3.14159265 / 180.0;
 
     vec3 c = cos( DegreesToRadians * theta );
     vec3 s = sin( DegreesToRadians * theta );
@@ -48,9 +50,10 @@ void main()
     texCoord    = vTexCoord;
     normal = vec4(vNormal, 0);
 
- 		gl_Position = vec4(vPosition, 1.0);
+	gl_Position = vec4(vPosition, 1.0);
     gl_Position = rz * ry * rx * gl_Position;
     vec4 t = rz * ry * rx * vec4(translation, 1.0);
+    gl_Position = projection * modelView * (gl_Position + vec4(translation, 0.0));
 
-    gl_Position = projection * (gl_Position + vec4(translation, 0.0));
+
 }

@@ -77,14 +77,16 @@ private:
 	int colorSize;
 	TriMesh m_TriMesh;
 	Mesh_Painter m_mp;
+	Mesh_Painter m_obj_mp;
 
 	// 正方体的一个面
 	void quad(int a, int b, int c, int d, color4 color);
 public:
 	My_Model();
-	void draw_lamb();
-	void draw_cube(color4 color);
-	void draw_floor();
+	void init_sphere();
+	// 绘制边长为1的正方体
+	void init_cube(color4 color);
+//	void draw_floor();
 	pointVec get_points();
 	colorVec get_colors();
 	void draw_human();
@@ -92,6 +94,8 @@ public:
 	int get_points_size();
 	int get_colors_size();
 	void draw_mesh();
+	void draw_obj_mesh();
+	void draw_wawa(string objFile = "texture/wawa.obj");
 };
 
 
