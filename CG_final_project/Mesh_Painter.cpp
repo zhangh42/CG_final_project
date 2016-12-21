@@ -50,6 +50,8 @@ void Mesh_Painter::draw_meshes()
 
 		glDrawArrays(GL_TRIANGLES, 0, this->m_my_meshes_[i]->num_faces() * 3);
 		glUseProgram(0);
+
+	//	glutSwapBuffers();
 	}
 };
 

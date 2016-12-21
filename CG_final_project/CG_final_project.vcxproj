@@ -135,6 +135,7 @@
     <None Include="v_texture.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="main.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="Mesh_Painter.h" />
     <ClInclude Include="MyModel.h" />

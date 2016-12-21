@@ -18,7 +18,6 @@ uniform mat4 projection;
 
 void main()
 {
-
 	const float  DegreesToRadians = 3.14159265 / 180.0;
 
     vec3 c = cos( DegreesToRadians * theta );

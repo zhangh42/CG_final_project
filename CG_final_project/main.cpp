@@ -1,7 +1,10 @@
 #include <cassert>
 #include <vector>
+#include <ctime>
+#include <cstdlib>
 #include "Angel.h"
 #include "MyModel.h"
+#include "main.h"
 using std::vector;
 using std::cout;
 using std::endl;
@@ -14,7 +17,8 @@ const GLfloat PI = 3.1415926;
 // 建模类
 My_Model m_model;
 
-
+// 各个着色器变量对应的id
+GLuint ShadowMatrix;
 GLuint ModelView;
 GLuint Projection;
 GLuint LightPos;
@@ -27,10 +31,10 @@ vector<point4> points;
 vector<color4> colors;
 vector<point4> normals;
 
-mat4 modelView(1.0);
+mat4 modelView;
 mat4 projection;
 
-vec3 lightPos(0.5, 4, 1.5);
+vec3 lightPos(0.5, 10, 2.5);
 // 计算阴影投影矩阵，绘制投影之后的三角形（用黑色表示）
 mat4 shadowProjMatrix(
 	-lightPos[1], 0, 0, 0,
@@ -38,7 +42,7 @@ mat4 shadowProjMatrix(
 	0, 0, -lightPos[1], 0,
 	0, 0, 0, -lightPos[1]);
 
-// Set up menu item indices, which we can alos use with the joint angles
+// 机器人身体各个部位对应的索引号
 enum {
 	Torso,
 	Head1,
@@ -55,7 +59,7 @@ enum {
 	Quit
 };
 
-// Joint angles with initial values
+// 机器人各个部位的初始角度
 GLfloat theta[NumJointAngles] = {
 	0.0,    // Torso
 	0.0,    // Head1
@@ -69,12 +73,14 @@ GLfloat theta[NumJointAngles] = {
 	180.0,  // LeftUpperLeg
 	0.0     // LeftLowerLeg
 };
-
+// 用于指定机器人当前转动的部位
 GLint angle = Head2;
 
-// 旋转角度大小
-const float THETA = 2.0;
-float rotationAngle[3] = { 0.0,0.0,0.0 };
+// 娃娃的移动向量
+vec3f wawa_translation(0.0);
+
+// 气球移动向量
+vec3f balloon_translation(0.0);
 
 // 坐标轴常量
 enum {
@@ -87,9 +93,6 @@ enum {
 // 相机参数设置
 namespace Camera
 {
-	/*mat4 modelMatrix(1.0);
-	mat4 viewMatrix(1.0);
-	mat4 projMatrix(1.0);*/
 	GLfloat theta = PI / 4;	// 绕x轴的旋转角度
 	GLfloat phi = PI / 2;	// 绕y轴的角度
 
@@ -155,9 +158,9 @@ void draw_sphere(color4 color)
 void init()
 {
 	// 顶点生成
-	// 绘制草坪
+	// 草坪数据初始化
 	m_model.init_grass("texture/grass.jpg");
-	// 绘制娃娃
+	// 娃娃数据初始化
 	m_model.init_wawa("texture/wawa.obj");
 
 	m_model.init_cube(red);
@@ -209,13 +212,14 @@ void init()
 	draw_color = glGetUniformLocation(program, "draw_color");
 	LightPos = glGetUniformLocation(program, "lightPos");
 	IsShadow = glGetUniformLocation(program, "isShadow");
+	ShadowMatrix = glGetUniformLocation(program, "shadowMatrix");
 	//glUseProgram(0);
 
 	// 开启深度测试
 	glEnable(GL_DEPTH_TEST);
 	// 这些作用未知 ？？
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
 	glDepthFunc(GL_LESS);		// 深度测试函数
 	//glEnable(GL_CULL_FACE);	// 面剔除
 	glClearColor(0.0, 0.0, 0.250, 1.0);
@@ -227,12 +231,12 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	modelView = mat4(1.0);
-
+	
 	/*modelViewMat = RotateX(rotationAngle[X_axis]);
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelViewMat);
 	glDrawArrays(GL_TRIANGLES, 0, 6);*/
 	m_model.draw_mesh();
-	modelView = Translate(0, 0, -2) * RotateX(-90) * Scale(0.8, 0.8, 0.8);
+	modelView = Translate(wawa_translation) * Translate(0, 0.5, -2) * RotateX(-90) * Scale(0.8, 0.8, 0.8);
 	m_model.draw_obj_mesh();
 
 	// 切换着色器
@@ -248,11 +252,19 @@ void display()
 	glUniform4fv(draw_color, 1, yellow);
 	glDrawArrays(GL_TRIANGLES, 36, points.size()); 
 
+	// 画个红色气球
+	modelView =  Translate(balloon_translation) * Translate(0, 6, 0);
+	draw_sphere(red);
+
+	// 画个红色气球
+	modelView = Translate(balloon_translation) * Translate(0, 6, -3);
+	draw_sphere(blue);
+
 
 	// 画个绿色的球
 	modelView = Translate(-3, 0.5, -2.5);
 	draw_sphere(blue);
-
+	
 	modelView = Scale(1.5, 1.5, 1.5) * Translate(1, 0.5, 1.5);
 	draw_sphere(magenta);
 
@@ -260,14 +272,14 @@ void display()
 	draw_sphere(cyan);
 
 	// 绘制人
-	modelView = Translate(-2, 0.5, -0.0);
+	modelView = Scale(1.5, 1.5, 1.5) * Translate(-2, 0.5, -0.0);
 	m_model.draw_human();
 	glUniform1i(IsShadow, 1);	// 绘制阴影
 	modelView = shadowProjMatrix * modelView;
 	m_model.draw_human();
 	glUniform1i(IsShadow, 0);	// 取消绘制阴影
 
-	glutSwapBuffers();
+	 glutSwapBuffers();
 }
 
 // 当窗口大小改变时调用此函数，根据长宽变化调整一些参数信息，
@@ -276,9 +288,9 @@ void reshape(int width, int height)
 {
 	glViewport(0, 0, width, height);
 
-	GLfloat left = -10.0, right = 10.0;
-	GLfloat bottom = -5.0, top = 15.0;
-	GLfloat zNear = -10.0, zFar = 10.0;
+	GLfloat left = -6.0, right = 6.0;
+	GLfloat bottom = -3.0, top = 9.0;
+	GLfloat zNear = -6.0, zFar = 6.0;
 
 	GLfloat aspect = GLfloat(width) / height;
 
@@ -302,10 +314,8 @@ void reshape(int width, int height)
 	point4  at(0.0, 0.0, 0.0, 1.0);
 	vec4    up(0.0, 1.0, 0.0, 0.0);
 
-	projection = Camera::ortho(-6, 6, -3, 9, -10, 10) * Camera::lookAt(eye, at, up);
+	projection = Camera::ortho(left, right, bottom, top, zNear, zFar) *  Camera::lookAt(eye, at, up);
 	glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
-
-	//model_view = mat4(1.0);   // An Identity matrix
 }
 
 // 键盘函数
@@ -317,7 +327,21 @@ void keyboard(unsigned char key, int x, int y)
 	case 'q': case 'Q':
 		exit(EXIT_SUCCESS);
 		break;
+	case 'w':
+		wawa_translation.z -= 0.1;
+		break;
+	case 's':
+		wawa_translation.z += 0.1;
+		break;
+	case 'a':
+		wawa_translation.x -= 0.1;
+		break;
+	case 'd':
+		wawa_translation.x += 0.1;
+		break;
 	}
+
+	glutPostRedisplay();
 }
 
 // 菜单函数
@@ -364,10 +388,10 @@ void specialKeyboard(int key, int x, int y)
 		if (Camera::theta < 0)
 			Camera::theta = 0;
 		break;
-	case GLUT_KEY_LEFT:
+	case GLUT_KEY_RIGHT:
 		Camera::phi += PI / 18;
 		break;
-	case GLUT_KEY_RIGHT:
+	case GLUT_KEY_LEFT:
 		Camera::phi -= PI / 18;
 		break;
 	}
@@ -396,6 +420,44 @@ void createMenu()
 	glutAttachMenu(GLUT_MIDDLE_BUTTON);
 }
 
+// 动画
+void idle()
+{
+	static int lasttime = clock();
+	if (clock() - lasttime > 500) // 每隔100ms调用一次
+	{
+		lasttime = clock();
+
+		int f = rand() % 6;
+		if (f == 0)
+			balloon_translation.x -= 0.3;
+		else if(f==1)
+			balloon_translation.x += 0.3;
+		else if (f == 2)
+			balloon_translation.z -= 0.3;
+		else if (f == 3)
+			balloon_translation.z += 0.3;
+		else if (f == 4)
+			balloon_translation.x += 0.3;
+		else if (f == 5)
+			balloon_translation.x += 0.3;
+
+		// 检查是否超过限定范围
+		if (balloon_translation.x < -3)
+			balloon_translation.x = 3;
+		else if (balloon_translation.x > 3)
+			balloon_translation = -3;
+		 if (balloon_translation.z < -3)
+			balloon_translation.z = 3;
+		else if (balloon_translation.z > 3)
+			balloon_translation.z = -3;
+
+		 glutPostRedisplay();
+	}
+
+	
+}
+
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
@@ -410,6 +472,8 @@ int main(int argc, char **argv)
 
 	init();
 
+	srand(time(0));
+	glutIdleFunc(idle);
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
