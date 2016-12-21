@@ -6,6 +6,8 @@ using std::vector;
 using std::cout;
 using std::endl;
 
+const GLfloat PI = 3.1415926;
+
 #pragma comment(lib, "glew32.lib")
 #pragma comment(lib, "FreeImage.lib")
 
@@ -16,6 +18,7 @@ My_Model m_model;
 GLuint ModelView;
 GLuint Projection;
 GLuint LightPos;
+GLuint IsShadow;
 GLuint program;
 GLuint draw_color;
 GLuint vao;
@@ -72,6 +75,7 @@ GLint angle = Head2;
 // 旋转角度大小
 const float THETA = 2.0;
 float rotationAngle[3] = { 0.0,0.0,0.0 };
+
 // 坐标轴常量
 enum {
 	X_axis = 0,
@@ -86,8 +90,8 @@ namespace Camera
 	/*mat4 modelMatrix(1.0);
 	mat4 viewMatrix(1.0);
 	mat4 projMatrix(1.0);*/
-	GLfloat angle = 0;
-	GLfloat height = 0.5;
+	GLfloat theta = PI / 4;	// 绕x轴的旋转角度
+	GLfloat phi = PI / 2;	// 绕y轴的角度
 
 	mat4 ortho(const GLfloat left, const GLfloat right,
 		const GLfloat bottom, const GLfloat top,
@@ -141,23 +145,26 @@ void draw_sphere(color4 color)
 	// 绘制阴影
 	modelView = shadowProjMatrix * modelView;
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView);
+	glUniform1i(IsShadow, 1);	// 绘制阴影
 	glUniform4fv(draw_color, 1, black);
 	glDrawArrays(GL_TRIANGLES, 36, points.size());
+	glUniform1i(IsShadow, 0);	// 取消绘制阴影
 }
 
 // 初始化函数，初始化一些参数信息
 void init()
 {
 	// 顶点生成
-	// todo here
-	m_model.draw_grass("texture/grass.jpg");
-	m_model.draw_wawa("texture/wawa.obj");
+	// 绘制草坪
+	m_model.init_grass("texture/grass.jpg");
+	// 绘制娃娃
+	m_model.init_wawa("texture/wawa.obj");
 
 	m_model.init_cube(red);
 	m_model.init_sphere();
 	points = m_model.get_points();
 	colors = m_model.get_colors();
-
+	normals = m_model.get_normals();
 
 
 	// Create a vertex array object
@@ -168,11 +175,13 @@ void init()
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(point4) * points.size() + sizeof(color4) * colors.size(),
-		NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(point4) * points.size() + sizeof(color4) * colors.size() +
+		sizeof(point4) * normals.size(), NULL, GL_DYNAMIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(point4) * points.size(), &points[0]);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(point4) * points.size(), sizeof(color4) * colors.size(),
 		&colors[0]);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(point4) * points.size() + sizeof(color4) * colors.size(),
+		sizeof(point4) * normals.size(), &normals[0]);
 
 	// Load shaders and use the resulting shader program
 	program = InitShader("vshader.glsl", "fshader.glsl");
@@ -192,22 +201,23 @@ void init()
 	GLuint vNormal = glGetAttribLocation(program, "vNormal");
 	glEnableVertexAttribArray(vNormal);
 	glVertexAttribPointer(vNormal, 4, GL_FLOAT, GL_FALSE, 0,
-		BUFFER_OFFSET(sizeof(point4) * normals.size()));
+		BUFFER_OFFSET(sizeof(point4) * points.size() + sizeof(color4) * colors.size()));
 
 
 	ModelView = glGetUniformLocation(program, "ModelView");
 	Projection = glGetUniformLocation(program, "Projection");
 	draw_color = glGetUniformLocation(program, "draw_color");
 	LightPos = glGetUniformLocation(program, "lightPos");
+	IsShadow = glGetUniformLocation(program, "isShadow");
 	//glUseProgram(0);
 
 	// 开启深度测试
 	glEnable(GL_DEPTH_TEST);
 	// 这些作用未知 ？？
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable(GL_LIGHTING);
-	glDepthFunc(GL_LESS);
-	//glEnable(GL_CULL_FACE);
+	//glEnable(GL_LIGHTING);
+	glDepthFunc(GL_LESS);		// 深度测试函数
+	//glEnable(GL_CULL_FACE);	// 面剔除
 	glClearColor(0.0, 0.0, 0.250, 1.0);
 }
 
@@ -225,6 +235,7 @@ void display()
 	modelView = Translate(0, 0, -2) * RotateX(-90) * Scale(0.8, 0.8, 0.8);
 	m_model.draw_obj_mesh();
 
+	// 切换着色器
 	glUseProgram(program);
 	glBindVertexArray(vao);
 
@@ -249,16 +260,12 @@ void display()
 	draw_sphere(cyan);
 
 	// 绘制人
-	modelView = Translate(0, 0.5, -0.0);
+	modelView = Translate(-2, 0.5, -0.0);
 	m_model.draw_human();
-
-
-
-	// 绘制人
-
-	modelView =shadowProjMatrix*Translate(0, 0.5, -0.0);
-	//modelView = RotateY(rotationAngle[X_axis])*Translate(-2, 0.5, -4.50);
+	glUniform1i(IsShadow, 1);	// 绘制阴影
+	modelView = shadowProjMatrix * modelView;
 	m_model.draw_human();
+	glUniform1i(IsShadow, 0);	// 取消绘制阴影
 
 	glutSwapBuffers();
 }
@@ -283,20 +290,19 @@ void reshape(int width, int height)
 		bottom /= aspect;
 		top /= aspect;
 	}
-
-	/*GLfloat radius = 1.0;
-	GLfloat theta = 0;
-	GLfloat phi = 3.14/6;
-	point4  eye(radius*sin(theta)*cos(phi),
-		radius*sin(theta)*sin(phi),
-		radius*cos(theta),
-		1.0);*/
-	point4 eye(0.0, 0.50, 1.0, 1.0);
+	
+	GLfloat radius = 1.0;
+	using Camera::phi;
+	using Camera::theta;
+	// 这里采用欧拉角
+	point4  eye(radius*cos(theta)*cos(phi),
+		radius*sin(theta),
+		radius*cos(theta)*sin(phi),
+		1.0);
 	point4  at(0.0, 0.0, 0.0, 1.0);
 	vec4    up(0.0, 1.0, 0.0, 0.0);
 
-//	projection = Ortho(-10, 10, -10, 10, -10, 10) * Camera::lookAt(eye, at, up);
-	projection = Ortho(-6, 6, -2, 10, -6, 6) * Camera::lookAt(eye, at, up);
+	projection = Camera::ortho(-6, 6, -3, 9, -10, 10) * Camera::lookAt(eye, at, up);
 	glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
 
 	//model_view = mat4(1.0);   // An Identity matrix
@@ -346,16 +352,28 @@ void mouse(int button, int state, int x, int y)
 // 键盘上下左右键响应函数
 void specialKeyboard(int key, int x, int y)
 {
-
 	switch (key)
 	{
 	case GLUT_KEY_DOWN:
-		rotationAngle[X_axis] += THETA;
+		Camera::theta += PI / 18;
+		if (Camera::theta >= PI / 2)
+			Camera::theta = PI / 2;
 		break;
 	case GLUT_KEY_UP:
-		rotationAngle[X_axis] -= THETA;
+		Camera::theta -= PI / 18;
+		if (Camera::theta < 0)
+			Camera::theta = 0;
+		break;
+	case GLUT_KEY_LEFT:
+		Camera::phi += PI / 18;
+		break;
+	case GLUT_KEY_RIGHT:
+		Camera::phi -= PI / 18;
 		break;
 	}
+	int width = glutGet(GLUT_WINDOW_WIDTH);
+	int height = glutGet(GLUT_WINDOW_HEIGHT);
+	reshape(width, height);
 	glutPostRedisplay();
 }
 

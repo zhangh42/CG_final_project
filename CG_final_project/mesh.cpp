@@ -87,6 +87,7 @@ const point3f& My_Mesh::get_center()
 // Éú³ÉµØ°å
 void My_Mesh::generate_floor()
 {
+	const int width = 10;
 	this->clear_data();
 	this->m_center_ = point3f(0, 0, 0);
 	//this->m_min_box_ = point3f(-3, 0, -3);
@@ -95,6 +96,7 @@ void My_Mesh::generate_floor()
 	m_vertices_.push_back(-6.0);
 	m_vertices_.push_back(0.0);
 	m_vertices_.push_back(6.0);
+	//m_vertices_.push_back(1.0);
 
 	m_vertices_.push_back(6.0);
 	m_vertices_.push_back(0.0);

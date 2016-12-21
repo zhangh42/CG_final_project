@@ -89,13 +89,14 @@ public:
 //	void draw_floor();
 	pointVec get_points();
 	colorVec get_colors();
+	pointVec get_normals();
 	void draw_human();
-	void draw_grass(string texture_file_name);
+	void init_grass(string texture_file_name);
 	int get_points_size();
 	int get_colors_size();
 	void draw_mesh();
 	void draw_obj_mesh();
-	void draw_wawa(string objFile = "texture/wawa.obj");
+	void init_wawa(string objFile = "texture/wawa.obj");
 };
 
 

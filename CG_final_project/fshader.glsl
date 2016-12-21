@@ -10,9 +10,9 @@ uniform vec3 lightPos;
 void main() 
 { 
 	// TODO 设置三维物体的材质属性
-	vec3 ambiColor = vec3(0.3, 0.3, 0.3);
-	vec3 diffColor = vec3(0.6, 0.6, 0.6);
-	vec3 specColor = vec3(0.4, 0.4, 0.4);
+	vec3 ambiColor = vec3(0.2, 0.2, 0.2);
+	vec3 diffColor = vec3(0.3, 0.3, 0.3);
+	vec3 specColor = vec3(0.5, 0.5, 0.5);
 
 	// TODO 计算N，L，V，R四个向量并归一化
 	vec3 N_norm = normalize(N);

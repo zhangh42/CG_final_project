@@ -166,13 +166,14 @@ void My_Model::init_sphere()
 		points.push_back(point4(v[f[i].b]));
 		points.push_back(point4(v[f[i].c]));
 
+
 		colors.push_back(yellow);
 		colors.push_back(yellow);
 		colors.push_back(yellow);
 
-		normals.push_back(point4(v[f[i].a]));
-		normals.push_back(point4(v[f[i].b]));
-		normals.push_back(point4(v[f[i].c]));
+		normals.push_back(point4(v[f[i].a], 0.0));
+		normals.push_back(point4(v[f[i].b], 0.0));
+		normals.push_back(point4(v[f[i].c], 0.0));
 	}
 }
 
@@ -228,6 +229,12 @@ colorVec My_Model::get_colors()
 	return colors;
 }
 
+pointVec My_Model::get_normals()
+{
+	return normals;
+}
+
+// 绘制机器人
 void My_Model::draw_human()
 {
 	MatrixStack mvstack;
@@ -277,7 +284,7 @@ void My_Model::draw_human()
 	modelView = mvstack.pop();//恢复父节点矩阵
 }
 
-void My_Model::draw_grass(string texture_file_name)
+void My_Model::init_grass(string texture_file_name)
 {
 	My_Mesh* my_mesh1 = new My_Mesh;
 	my_mesh1->generate_floor();//生成地板
@@ -313,7 +320,7 @@ void My_Model::draw_obj_mesh()
 	m_obj_mp.draw_meshes();
 }
 
-void My_Model::draw_wawa(string objFile)
+void My_Model::init_wawa(string objFile)
 {
 	
 	My_Mesh* my_mesh1 = new My_Mesh;

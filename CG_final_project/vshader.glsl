@@ -11,6 +11,7 @@ out vec3 V;
 uniform mat4 ModelView;
 uniform mat4 Projection;
 uniform vec4 draw_color;
+uniform int isShadow;
 
 void main() 
 {
@@ -20,7 +21,7 @@ void main()
     gl_Position = vec4(t.xyz / t.w, 1.0);
 
 	// ≈–∂œ «∑Ò «“ı”∞
-	if (t.w != 1.0)
+	if (isShadow == 1.0)
 		color = vec4(0,0,0,1.0);
 
 
