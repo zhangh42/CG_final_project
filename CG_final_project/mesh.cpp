@@ -94,20 +94,20 @@ void My_Mesh::generate_floor()
 	//this->m_max_box_ = point3f(3, 6, 3);
 
 	m_vertices_.push_back(-6.0);
-	m_vertices_.push_back(0.0);
+	m_vertices_.push_back(-0.01);
 	m_vertices_.push_back(6.0);
 	//m_vertices_.push_back(1.0);
 
 	m_vertices_.push_back(6.0);
-	m_vertices_.push_back(0.0);
+	m_vertices_.push_back(-0.01);
 	m_vertices_.push_back(6.0);
 
 	m_vertices_.push_back(-6.0);
-	m_vertices_.push_back(0.0);
+	m_vertices_.push_back(-0.01);
 	m_vertices_.push_back(-6.0);	
 
 	m_vertices_.push_back(6.0);
-	m_vertices_.push_back(0.0);
+	m_vertices_.push_back(-0.01);
 	m_vertices_.push_back(-6.0);
 
 	

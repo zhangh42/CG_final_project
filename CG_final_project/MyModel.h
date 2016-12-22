@@ -40,6 +40,7 @@ extern GLfloat theta[11];
 #define HAIR_HEIGHT 0.1
 #define HAIR_WIDTH 0.5
 
+// 画一个正方体的所需的顶点数
 const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
 
 
@@ -86,7 +87,6 @@ public:
 	void init_sphere();
 	// 绘制边长为1的正方体
 	void init_cube(color4 color);
-//	void draw_floor();
 	pointVec get_points();
 	colorVec get_colors();
 	pointVec get_normals();

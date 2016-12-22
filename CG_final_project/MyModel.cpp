@@ -328,8 +328,8 @@ void My_Model::init_wawa(string objFile)
 	my_mesh1->load_obj(objFile);
 	my_mesh1->set_texture_file("texture/wawa.png");
 	my_mesh1->set_translate(0.5, 0, 0);
-	my_mesh1->set_theta(90, 0., 0.);
-	my_mesh1->set_theta_step(0, 1, 0);	
+//	my_mesh1->set_theta(90, 0., 0.);
+//	my_mesh1->set_theta_step(0, 1, 0);	
 	m_obj_mp.add_mesh(my_mesh1);
 
 	m_obj_mp.init_shaders("v_texture.glsl", "f_texture.glsl");

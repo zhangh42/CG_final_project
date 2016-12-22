@@ -3,17 +3,17 @@
 
 
 
-mat4 lookAt(const vec4& eye, const vec4& at, const vec4& up)
-{
-	vec4 n = normalize(eye - at);
-	vec3 uu = normalize(cross(up, n));
-	vec4 u = vec4(uu.x, uu.y, uu.z, 0.0);
-	vec3 vv = normalize(cross(n, u));
-	vec4 v = vec4(vv.x, vv.y, vv.z, 0.0);
-	vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
-	mat4 c = mat4(u, v, n, t);
-	return c * Translate(-eye);
-}
+//mat4 lookAt(const vec4& eye, const vec4& at, const vec4& up)
+//{
+//	vec4 n = normalize(eye - at);
+//	vec3 uu = normalize(cross(up, n));
+//	vec4 u = vec4(uu.x, uu.y, uu.z, 0.0);
+//	vec3 vv = normalize(cross(n, u));
+//	vec4 v = vec4(vv.x, vv.y, vv.z, 0.0);
+//	vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
+//	mat4 c = mat4(u, v, n, t);
+//	return c * Translate(-eye);
+//}
 
 Mesh_Painter::Mesh_Painter()
 {
@@ -44,7 +44,6 @@ void Mesh_Painter::draw_meshes()
 		this->m_my_meshes_[i]->get_translate(x, y, z);
 		GLfloat  vTranslation[3] = { x, y, z };
 		glUniform3fv(trans_all[i], 1, vTranslation);
-	//	glUniformMatrix4fv(trans_all[i], 1, GL_TRUE, modelView);
 		glUniformMatrix4fv(ModelView_all[i], 1, GL_TRUE, modelView);
 		glUniformMatrix4fv(proj_all[i], 1, GL_TRUE, projection);
 

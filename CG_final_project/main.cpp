@@ -34,7 +34,7 @@ vector<point4> normals;
 mat4 modelView;
 mat4 projection;
 
-vec3 lightPos(0.5, 10, 2.5);
+vec3 lightPos(0.5, 10, 0.5);
 // 计算阴影投影矩阵，绘制投影之后的三角形（用黑色表示）
 mat4 shadowProjMatrix(
 	-lightPos[1], 0, 0, 0,
@@ -80,7 +80,11 @@ GLint angle = Head2;
 vec3f wawa_translation(0.0);
 
 // 气球移动向量
-vec3f balloon_translation(0.0);
+vec3f balloon1_translation(0.0);
+vec3f balloon2_translation(0.0);
+
+// 机器人y移动向量
+vec3f human_translateion(0.0);
 
 // 坐标轴常量
 enum {
@@ -169,7 +173,6 @@ void init()
 	colors = m_model.get_colors();
 	normals = m_model.get_normals();
 
-
 	// Create a vertex array object
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -246,19 +249,19 @@ void display()
 	glUniform3fv(LightPos, 1, &lightPos[0]);
 
 	// 绘制月亮
-	modelView = Translate(0, 4.5, -3.5);
+	modelView = Translate(0, 5.5, -3.5);
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView);
 	// 绘制颜色
 	glUniform4fv(draw_color, 1, yellow);
 	glDrawArrays(GL_TRIANGLES, 36, points.size()); 
 
-	// 画个红色气球
-	modelView =  Translate(balloon_translation) * Translate(0, 6, 0);
+	// 画个红色的随机移动的球
+	modelView = Translate(balloon1_translation) * Translate(0, 0.5, 2);
 	draw_sphere(red);
 
-	// 画个红色气球
-	modelView = Translate(balloon_translation) * Translate(0, 6, -3);
-	draw_sphere(blue);
+	// 画个蓝色的随机移动的球
+	modelView = Translate(balloon2_translation) * Translate(0, 0.5, -2);
+	draw_sphere(green);
 
 
 	// 画个绿色的球
@@ -271,8 +274,10 @@ void display()
 	modelView = Scale(1.5, 1.5, 1.5) * Translate(1.5, 0.5, 0);
 	draw_sphere(cyan);
 
-	// 绘制人
+	// 绘制人，初始参数
 	modelView = Scale(1.5, 1.5, 1.5) * Translate(-2, 0.5, -0.0);
+	// 键盘控制移动机器人
+	modelView = Translate(human_translateion) * modelView;
 	m_model.draw_human();
 	glUniform1i(IsShadow, 1);	// 绘制阴影
 	modelView = shadowProjMatrix * modelView;
@@ -316,6 +321,7 @@ void reshape(int width, int height)
 
 	projection = Camera::ortho(left, right, bottom, top, zNear, zFar) *  Camera::lookAt(eye, at, up);
 	glUniformMatrix4fv(Projection, 1, GL_TRUE, projection);
+
 }
 
 // 键盘函数
@@ -327,6 +333,8 @@ void keyboard(unsigned char key, int x, int y)
 	case 'q': case 'Q':
 		exit(EXIT_SUCCESS);
 		break;
+
+	// 娃娃移动控制
 	case 'w':
 		wawa_translation.z -= 0.1;
 		break;
@@ -338,6 +346,20 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 'd':
 		wawa_translation.x += 0.1;
+		break;
+
+	// 机器人移动控制
+	case 'i':
+		human_translateion.z -= 0.1;
+		break;
+	case 'k':
+		human_translateion.z += 0.1;
+		break;
+	case 'j':
+		human_translateion.x -= 0.1;
+		break;
+	case 'l':
+		human_translateion.x += 0.1;
 		break;
 	}
 
@@ -424,35 +446,56 @@ void createMenu()
 void idle()
 {
 	static int lasttime = clock();
-	if (clock() - lasttime > 500) // 每隔100ms调用一次
+	if (clock() - lasttime > 500) // 每隔500ms调用一次
 	{
 		lasttime = clock();
 
 		int f = rand() % 6;
-		if (f == 0)
-			balloon_translation.x -= 0.3;
-		else if(f==1)
-			balloon_translation.x += 0.3;
-		else if (f == 2)
-			balloon_translation.z -= 0.3;
-		else if (f == 3)
-			balloon_translation.z += 0.3;
-		else if (f == 4)
-			balloon_translation.x += 0.3;
-		else if (f == 5)
-			balloon_translation.x += 0.3;
+		if (f == 0) {
+			balloon1_translation.x -= 0.5;
+			balloon2_translation.x += 0.3;
+		}
+		else if (f == 1) {
+			balloon1_translation.x += 0.3;
+			balloon2_translation.x -= 0.5;
+		}
+		else if (f == 2) {
+			balloon1_translation.z -= 0.5;
+			balloon2_translation.z += 0.5;
+		}
+		else if (f == 3) {
+			balloon1_translation.z += 0.5;
+			balloon2_translation.x += 0.3;
+		}
+		else if (f == 4) {
+			balloon1_translation.x += 0.3;
+			balloon2_translation.x += 0.3;
+		}
+		else if (f == 5) {
+			balloon1_translation.x += 0.3;
+			balloon2_translation.z -= 0.5;
+		}
 
 		// 检查是否超过限定范围
-		if (balloon_translation.x < -3)
-			balloon_translation.x = 3;
-		else if (balloon_translation.x > 3)
-			balloon_translation = -3;
-		 if (balloon_translation.z < -3)
-			balloon_translation.z = 3;
-		else if (balloon_translation.z > 3)
-			balloon_translation.z = -3;
+		if (balloon1_translation.x < -5)
+			balloon1_translation.x = 5;
+		else if (balloon1_translation.x > 5)
+			balloon1_translation.x = -5;
+		if (balloon1_translation.z < -5)
+			balloon1_translation.z = 5;
+		else if (balloon1_translation.z > 5)
+			balloon1_translation.z = -5;
 
-		 glutPostRedisplay();
+		if (balloon2_translation.x < -5)
+			balloon2_translation.x = 5;
+		else if (balloon2_translation.x > 5)
+			balloon2_translation.x = -5;
+		if (balloon2_translation.z < -5)
+			balloon2_translation.z = 5;
+		else if (balloon2_translation.z > 5)
+			balloon2_translation.z = -5;
+
+		glutPostRedisplay();
 	}
 
 	
