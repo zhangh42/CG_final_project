@@ -10,7 +10,6 @@
 
 My_Mesh::My_Mesh()
 {
-
 	vTranslation[0] = Theta[0] = 0;
 	vTranslation[1] = Theta[1] = 0;
 	vTranslation[2] = Theta[2] = 0;
@@ -84,19 +83,18 @@ const point3f& My_Mesh::get_center()
 	return this->m_center_;
 };
 
-// 生成地板
+// 生成地板，即草坪
 void My_Mesh::generate_floor()
 {
 	const int width = 10;
 	this->clear_data();
 	this->m_center_ = point3f(0, 0, 0);
-	//this->m_min_box_ = point3f(-3, 0, -3);
-	//this->m_max_box_ = point3f(3, 6, 3);
 
+	// 四个顶点，即两个三角形构成一个正方形
+	// 为了避免与阴影产生深度冲突，将y坐标设置为-0.01
 	m_vertices_.push_back(-6.0);
 	m_vertices_.push_back(-0.01);
 	m_vertices_.push_back(6.0);
-	//m_vertices_.push_back(1.0);
 
 	m_vertices_.push_back(6.0);
 	m_vertices_.push_back(-0.01);
@@ -109,9 +107,7 @@ void My_Mesh::generate_floor()
 	m_vertices_.push_back(6.0);
 	m_vertices_.push_back(-0.01);
 	m_vertices_.push_back(-6.0);
-
-	
-	
+		
 	
 	// 加入法向量并且根据法向量生成颜色
 	for (int i = 0; i < 4; i++)

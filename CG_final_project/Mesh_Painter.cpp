@@ -3,18 +3,6 @@
 
 
 
-//mat4 lookAt(const vec4& eye, const vec4& at, const vec4& up)
-//{
-//	vec4 n = normalize(eye - at);
-//	vec3 uu = normalize(cross(up, n));
-//	vec4 u = vec4(uu.x, uu.y, uu.z, 0.0);
-//	vec3 vv = normalize(cross(n, u));
-//	vec4 v = vec4(vv.x, vv.y, vv.z, 0.0);
-//	vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
-//	mat4 c = mat4(u, v, n, t);
-//	return c * Translate(-eye);
-//}
-
 Mesh_Painter::Mesh_Painter()
 {
 }
@@ -36,11 +24,6 @@ void Mesh_Painter::draw_meshes()
 		glBindTexture(GL_TEXTURE_2D, this->textures_all[i]);//该语句必须，否则将只使用同一个纹理进行绘制
 
 		float x, y, z;
-	/*	this->m_my_meshes_[i]->get_theta(x, y, z);
-		GLfloat  Theta[3] = { x, y, z };*/
-	/*	this->m_my_meshes_[i]->add_theta_step();
-		glUniform3fv(theta_all[i], 1, Theta);*/
-
 		this->m_my_meshes_[i]->get_translate(x, y, z);
 		GLfloat  vTranslation[3] = { x, y, z };
 		glUniform3fv(trans_all[i], 1, vTranslation);
@@ -346,6 +329,7 @@ void Mesh_Painter::update_vertex_buffer()
 		this->vNormal_all.push_back(vNormal);
 	}
 };
+
 void Mesh_Painter::init_shaders(std::string vs, std::string fs)
 {
 	this->program_all.clear();

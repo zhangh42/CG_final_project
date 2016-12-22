@@ -16,11 +16,12 @@ enum {
 	Quit
 };
 
-void
-torso()
-{
-	// mvstack.push( model_view );//保存父节点矩阵
+// ****************************************************************************** 
+//							 分别绘制机器人的各个部位
 
+void torso()
+{
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * TORSO_HEIGHT, 0.0) *
 		Scale(TORSO_WIDTH, TORSO_HEIGHT, TORSO_WIDTH));//本节点局部变换矩阵
 
@@ -28,12 +29,11 @@ torso()
 	glUniform4fv(draw_color, 1, blue);
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
-	//glUniform4fv(draw_color, 1, color_torso);
-	// model_view = mvstack.pop();//恢复父节点矩阵
 }
 
 void head()
 {
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * HEAD_HEIGHT, 0.0) *
 		Scale(HEAD_WIDTH, HEAD_HEIGHT, HEAD_WIDTH));//本节点局部变换矩阵
 
@@ -44,28 +44,29 @@ void head()
 
 void neck()
 {
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * NECK_HEIGHT, 0.0) *
 		Scale(NECK_WIDTH, NECK_HEIGHT, NECK_WIDTH));//本节点局部变换矩阵
 
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
 	glUniform4fv(draw_color, 1, cyan);
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
-	//glUniform4fv(draw_color, 1, color_torso);
 }
 
 void hair()
 {
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * HAIR_HEIGHT, 0.0) *
 		Scale(HAIR_WIDTH, HAIR_HEIGHT, HAIR_WIDTH));//本节点局部变换矩阵
 
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
 	glUniform4fv(draw_color, 1, black);
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
-	//glUniform4fv(draw_color, 1, color_torso);
 }
 
 void left_upper_arm()
 {
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * UPPER_ARM_HEIGHT, 0.0) *
 		Scale(UPPER_ARM_WIDTH, UPPER_ARM_HEIGHT, UPPER_ARM_WIDTH));//本节点局部变换矩阵
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
@@ -75,6 +76,7 @@ void left_upper_arm()
 
 void left_lower_arm()
 {
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * LOWER_ARM_HEIGHT, 0.0) *
 		Scale(LOWER_ARM_WIDTH, LOWER_ARM_HEIGHT, LOWER_ARM_WIDTH));//本节点局部变换矩阵
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
@@ -84,6 +86,7 @@ void left_lower_arm()
 
 void right_upper_arm()
 {
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * UPPER_ARM_HEIGHT, 0.0) *
 		Scale(UPPER_ARM_WIDTH, UPPER_ARM_HEIGHT, UPPER_ARM_WIDTH));//本节点局部变换矩阵
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
@@ -93,6 +96,7 @@ void right_upper_arm()
 
 void right_lower_arm()
 {
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * LOWER_ARM_HEIGHT, 0.0) *
 		Scale(LOWER_ARM_WIDTH, LOWER_ARM_HEIGHT, LOWER_ARM_WIDTH));//本节点局部变换矩阵
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
@@ -102,6 +106,7 @@ void right_lower_arm()
 
 void left_upper_leg()
 {
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * UPPER_LEG_HEIGHT, 0.0) *
 		Scale(UPPER_LEG_WIDTH, UPPER_LEG_HEIGHT, UPPER_LEG_WIDTH));//本节点局部变换矩阵
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
@@ -111,6 +116,7 @@ void left_upper_leg()
 
 void left_lower_leg()
 {
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * LOWER_LEG_HEIGHT, 0.0) *
 		Scale(LOWER_LEG_WIDTH, LOWER_LEG_HEIGHT, LOWER_LEG_WIDTH));//本节点局部变换矩阵
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
@@ -120,6 +126,7 @@ void left_lower_leg()
 
 void right_upper_leg()
 {
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * UPPER_LEG_HEIGHT, 0.0) *
 		Scale(UPPER_LEG_WIDTH, UPPER_LEG_HEIGHT, UPPER_LEG_WIDTH));//本节点局部变换矩阵
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
@@ -129,12 +136,15 @@ void right_upper_leg()
 
 void right_lower_leg()
 {
+	// 对边长为1的正方体进行变换得到机器人的某一部分
 	mat4 instance = (Translate(0.0, 0.5 * LOWER_LEG_HEIGHT, 0.0) *
 		Scale(LOWER_LEG_WIDTH, LOWER_LEG_HEIGHT, LOWER_LEG_WIDTH));//本节点局部变换矩阵
 	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelView * instance);//父节点矩阵*本节点局部变换矩阵
 	glUniform4fv(draw_color, 1, black);
 	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 }
+//					以上函数绘制机器人的各个部位
+// **************************************************************************************
 
 // 正方体的一个面
 void My_Model::quad(int a, int b, int c, int d, color4 color)
@@ -198,26 +208,6 @@ void My_Model::init_cube(color4 color)
 	colorSize += 36;
 }
 
-// 绘制地板
-//void My_Model::draw_floor()
-//{
-//	point4 p1(-10, 0, -10, 1.0);
-//	point4 p2(-10, 0, 10, 1.0);
-//	point4 p3(10, 0, -10, 1.0);
-//	point4 p4(10, 0, 10, 1.0);
-//
-//	points.push_back(p1);
-//	points.push_back(p2);
-//	points.push_back(p3);
-//	points.push_back(p2);
-//	points.push_back(p3);
-//	points.push_back(p4);
-//	for (int i = 0;i < 6;i++)
-//		colors.push_back(green);
-//
-//	pointSize += 6;
-//	colorSize += 6;
-//}
 
 pointVec My_Model::get_points()
 {
@@ -239,7 +229,7 @@ void My_Model::draw_human()
 {
 	MatrixStack mvstack;
 	mvstack.push(modelView);
-	//std::cout << modelView << std::endl;
+
 	modelView *= RotateY(theta[Torso]);//躯干变换矩阵
 	torso();//躯干绘制
 
@@ -284,17 +274,16 @@ void My_Model::draw_human()
 	modelView = mvstack.pop();//恢复父节点矩阵
 }
 
+// 初始化草坪
 void My_Model::init_grass(string texture_file_name)
 {
 	My_Mesh* my_mesh1 = new My_Mesh;
 	my_mesh1->generate_floor();//生成地板
 	my_mesh1->set_texture_file(texture_file_name);//指定纹理图像文件
 	my_mesh1->set_translate(0, 0, 0);
-//	my_mesh1->set_theta(45, 45, 45.);//旋转轴
-//	my_mesh1->set_theta_step(1, 1, 1);//旋转速度
 	m_mp.add_mesh(my_mesh1);
 
-
+	// 指定着色器
 	m_mp.init_shaders("v_texture.glsl", "f_texture.glsl");
 	m_mp.update_vertex_buffer();
 	m_mp.update_texture();
@@ -310,16 +299,19 @@ int My_Model::get_colors_size()
 	return colorSize;
 }
 
+// 绘制草坪纹理
 void My_Model::draw_mesh()
 {
 	m_mp.draw_meshes();
 }
 
+// 绘制娃娃纹理
 void My_Model::draw_obj_mesh()
 {
 	m_obj_mp.draw_meshes();
 }
 
+// 初始化娃娃
 void My_Model::init_wawa(string objFile)
 {
 	
@@ -328,10 +320,9 @@ void My_Model::init_wawa(string objFile)
 	my_mesh1->load_obj(objFile);
 	my_mesh1->set_texture_file("texture/wawa.png");
 	my_mesh1->set_translate(0.5, 0, 0);
-//	my_mesh1->set_theta(90, 0., 0.);
-//	my_mesh1->set_theta_step(0, 1, 0);	
 	m_obj_mp.add_mesh(my_mesh1);
 
+	// 指定着色器
 	m_obj_mp.init_shaders("v_texture.glsl", "f_texture.glsl");
 	m_obj_mp.update_obj_vertex_buffer();
 	m_obj_mp.update_texture();

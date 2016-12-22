@@ -9,10 +9,10 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-const GLfloat PI = 3.1415926;
-
 #pragma comment(lib, "glew32.lib")
 #pragma comment(lib, "FreeImage.lib")
+
+const GLfloat PI = 3.1415926;
 
 // 建模类
 My_Model m_model;
@@ -97,6 +97,7 @@ enum {
 // 相机参数设置
 namespace Camera
 {
+	// 欧拉坐标控制相机的切换
 	GLfloat theta = PI / 4;	// 绕x轴的旋转角度
 	GLfloat phi = PI / 2;	// 绕y轴的角度
 
@@ -220,7 +221,6 @@ void init()
 
 	// 开启深度测试
 	glEnable(GL_DEPTH_TEST);
-	// 这些作用未知 ？？
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_LIGHTING);
 	glDepthFunc(GL_LESS);		// 深度测试函数
@@ -234,12 +234,11 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	modelView = mat4(1.0);
-	
-	/*modelViewMat = RotateX(rotationAngle[X_axis]);
-	glUniformMatrix4fv(ModelView, 1, GL_TRUE, modelViewMat);
-	glDrawArrays(GL_TRIANGLES, 0, 6);*/
+	// 画草坪
 	m_model.draw_mesh();
-	modelView = Translate(wawa_translation) * Translate(0, 0.5, -2) * RotateX(-90) * Scale(0.8, 0.8, 0.8);
+	modelView = Translate(wawa_translation) // 用户控制移动
+		* Translate(0, 0.5, -2) * RotateX(-90) * Scale(0.8, 0.8, 0.8);	// 初始参数
+	// 绘制娃娃
 	m_model.draw_obj_mesh();
 
 	// 切换着色器
@@ -267,10 +266,10 @@ void display()
 	// 画个绿色的球
 	modelView = Translate(-3, 0.5, -2.5);
 	draw_sphere(blue);
-	
+	// 画个magenta色的球
 	modelView = Scale(1.5, 1.5, 1.5) * Translate(1, 0.5, 1.5);
 	draw_sphere(magenta);
-
+	// 画个cyan色的球
 	modelView = Scale(1.5, 1.5, 1.5) * Translate(1.5, 0.5, 0);
 	draw_sphere(cyan);
 
@@ -282,7 +281,7 @@ void display()
 	glUniform1i(IsShadow, 1);	// 绘制阴影
 	modelView = shadowProjMatrix * modelView;
 	m_model.draw_human();
-	glUniform1i(IsShadow, 0);	// 取消绘制阴影
+	glUniform1i(IsShadow, 0);	// 停止绘制阴影
 
 	 glutSwapBuffers();
 }
@@ -297,8 +296,8 @@ void reshape(int width, int height)
 	GLfloat bottom = -3.0, top = 9.0;
 	GLfloat zNear = -6.0, zFar = 6.0;
 
+	// 调整视窗体，使之适应窗口而不变形
 	GLfloat aspect = GLfloat(width) / height;
-
 	if (aspect > 1.0) {
 		left *= aspect;
 		right *= aspect;
@@ -400,6 +399,7 @@ void specialKeyboard(int key, int x, int y)
 {
 	switch (key)
 	{
+	// 控制相机的上下移动
 	case GLUT_KEY_DOWN:
 		Camera::theta += PI / 18;
 		if (Camera::theta >= PI / 2)
@@ -410,6 +410,8 @@ void specialKeyboard(int key, int x, int y)
 		if (Camera::theta < 0)
 			Camera::theta = 0;
 		break;
+
+	// 控制相机的左右移动
 	case GLUT_KEY_RIGHT:
 		Camera::phi += PI / 18;
 		break;
@@ -417,6 +419,8 @@ void specialKeyboard(int key, int x, int y)
 		Camera::phi -= PI / 18;
 		break;
 	}
+
+	// 由于projection和相机变换都放在reshape里，所以调用reshape重绘
 	int width = glutGet(GLUT_WINDOW_WIDTH);
 	int height = glutGet(GLUT_WINDOW_HEIGHT);
 	reshape(width, height);
@@ -426,9 +430,10 @@ void specialKeyboard(int key, int x, int y)
 // 鼠标菜单函数
 void createMenu()
 {
+	// 创建控制机器人的菜单
 	glutCreateMenu(menu);
 	glutAddMenuEntry("torso", Torso);
-	glutAddMenuEntry("head1", Head1);
+	glutAddMenuEntry("head", Head1);
 //	glutAddMenuEntry("head2", Head2);
 	glutAddMenuEntry("right_upper_arm", RightUpperArm);
 	glutAddMenuEntry("right_lower_arm", RightLowerArm);
@@ -449,7 +454,8 @@ void idle()
 	if (clock() - lasttime > 500) // 每隔500ms调用一次
 	{
 		lasttime = clock();
-
+		// 生成0到5的随机数，并且根据随机数大小移动气球
+		// 从而得到气球随机移动的动画
 		int f = rand() % 6;
 		if (f == 0) {
 			balloon1_translation.x -= 0.5;
@@ -522,7 +528,7 @@ int main(int argc, char **argv)
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
 	glutSpecialFunc(specialKeyboard);
-	createMenu();
+	createMenu();	
 
 	glutMainLoop();
 	return 0;

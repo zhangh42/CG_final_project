@@ -16,6 +16,7 @@ typedef vector<point4> pointVec;
 typedef vector<color4> colorVec;
 typedef vector<float> textureVec;
 
+// mainc.cpp里共享的全局变量
 extern GLuint ModelView;
 extern GLuint draw_color;
 extern mat4 modelView;
@@ -44,7 +45,7 @@ extern GLfloat theta[11];
 const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
 
 
-// 边长为1的正方形
+// 边长为1的正方形体
 static point4 vertices[8] = {
 	point4(-0.5, -0.5,-0.5, 1.0),
 	point4(-0.5, -0.5, 0.5, 1.0),
@@ -67,6 +68,7 @@ static color4 cyan(0.0, 1.0, 1.0, 1.0);
 static color4 white(1.0, 1.0, 1.0, 1.0);
 static color4 OliveDrab(107, 142, 35, 1);
 
+// 我的模型
 class My_Model
 {
 private:
